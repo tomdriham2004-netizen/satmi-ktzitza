@@ -142,7 +142,7 @@ export class CameraDirector {
     const pitch = clamp(this.cur.pitch + this.user.pitch + Math.sin(this.drift * 0.21) * 0.006, 0.08, 1.45);
     const fit = Math.min(1.8, Math.max(1, 1.45 / this.camera.aspect));
     // phones held sideways: frame a little tighter so the town reads bigger
-    const near = IS_PHONE && this.camera.aspect > 1.3 ? 0.86 : 1;
+    const near = IS_PHONE && this.camera.aspect > 1.3 ? 0.74 : 1;
     const dist = this.cur.dist * this.user.zoom * fit * near;
     const t = this.cur.target;
     const cp = Math.cos(pitch);
