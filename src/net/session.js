@@ -291,7 +291,7 @@ export class HostSession {
       return !!held.get(p.id);
     };
     try {
-      return await this.P.runAuction(o, { ui: mirrorUI, audio: mirrorAudio, holdFn, keyLabel: (p) => (p.isAI ? null : 'SPACE') });
+      return await this.P.runAuction(o, { ui: mirrorUI, audio: mirrorAudio, holdFn, keyLabel: (p) => (p.isAI ? null : 'רווח') });
     } finally {
       this.auctions.delete(id);
     }

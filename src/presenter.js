@@ -239,13 +239,13 @@ export class Presenter {
       const ts = this.state.tiles[i];
       let sub = '';
       if (isOwnable(t)) {
-        if (ts.owner === null) sub = `For sale · ${money(t.price)}`;
+        if (ts.owner === null) sub = `למכירה · ${money(t.price)}`;
         else {
           const o = this.state.players[ts.owner];
-          sub = `${o.name}'s · ${t.type === 'property' ? LEVEL_NAMES[ts.level] : ''}${ts.mortgaged ? ' · mortgaged' : ` · rent ${money(R.rentFor(this.state, i, 7).amount)}`}`;
+          sub = `של ${o.name}${t.type === 'property' ? ` · ${LEVEL_NAMES[ts.level]}` : ''}${ts.mortgaged ? ' · ממושכן' : ` · שכירות ${money(R.rentFor(this.state, i, 7).amount)}`}`;
         }
-        if (this.tilePick?.allowed.includes(i)) sub = `Click to upgrade · ${money(R.buildCost(i))}`;
-      } else sub = { go: 'Collect $200 passing by', jail: 'The Slammer', heist: `Crack the Vault · ${money(this.state.vault)}`, gotojail: 'Go straight to jail', news: 'Breaking News card', fortune: 'Fortune card', tax: `Pay $${t.amount} into the Vault` }[t.type] || '';
+        if (this.tilePick?.allowed.includes(i)) sub = `לחץ לשדרוג · ${money(R.buildCost(i))}`;
+      } else sub = { go: 'מקבלים ₪200 בכל מעבר', jail: 'הכלא', heist: `פרוץ את הכספת · ${money(this.state.vault)}`, gotojail: 'ישר לכלא', news: 'קלף מבזק חדשות', fortune: 'קלף מזל', tax: `שלם ₪${t.amount} לכספת` }[t.type] || '';
       const el = $(`<div class="tile-tip" style="--tc:${t.district ? DISTRICTS[t.district].color : '#8c93a8'}">${t.name}<small>${sub}</small></div>`);
       tip = this.labels.add(el, tileCenter(i).setY(0.6), { offsetY: -10 });
     });
@@ -276,7 +276,7 @@ export class Presenter {
     for (const [pid, l] of this.posters) if (pid !== wantedId) { l.remove(); this.posters.delete(pid); }
     if (wantedId !== null && !this.posters.has(wantedId)) {
       const p = s.players[wantedId];
-      const el = $(`<div class="wanted"><small>WANTED</small><img src="${this.ui.pimg(p)}"><div class="amt">${money(s.bounty.amount)}</div><small>REWARD</small></div>`);
+      const el = $(`<div class="wanted"><small>מבוקש</small><img src="${this.ui.pimg(p)}"><div class="amt">${money(s.bounty.amount)}</div><small>פרס</small></div>`);
       this.posters.set(wantedId, this.labels.add(el, () => this.pawnOf(p).root.position.clone().add(V(0, 2.25, 0)), { scaleWithDistance: true }));
     } else if (wantedId !== null) {
       this.posters.get(wantedId).el.querySelector('.amt').textContent = money(s.bounty.amount);
@@ -310,7 +310,7 @@ export class Presenter {
     const first = state.players[state.turn];
     this.cam.move({ target: V(0, 0, 0), yaw: Math.PI / 4 - 0.6, pitch: 1.05, dist: 52 }, 0.01);
     await this.cam.move({ target: V(0, 0, 0), yaw: Math.PI / 4, pitch: 0.9, dist: 42 }, 2.2, Ease.inOutCubic);
-    await this.ui.banner({ title: state.round === 1 ? 'LET\'S GO!' : 'WELCOME BACK!', subtitle: `${state.players.length} tycoons · ${state.settings.roundLimit ? `${state.settings.roundLimit} rounds` : 'last one standing'}`, icon: '🎲', color: this.color(first), duration: 1.4 });
+    await this.ui.banner({ title: state.round === 1 ? 'יאללה!' : 'ברוכים השבים!', subtitle: `${state.players.length} טייקונים · ${state.settings.roundLimit ? `${state.settings.roundLimit} סיבובים` : 'האחרון שנשאר מנצח'}`, icon: '🎲', color: this.color(first), duration: 1.4 });
   }
 
   async turnStart(p) {
@@ -329,8 +329,8 @@ export class Presenter {
     this.ui.pulsePlayer(p.id);
     pawn.wave();
     audio.play('whoosh', { vol: 0.35 });
-    await this.ui.banner({ title: this.isLocal(p) ? `${p.name}, you're up!` : `${p.name}'s turn`, subtitle: p.inJail ? '🔒 In the Slammer' : s.bounty?.playerId === p.id ? `🎯 WANTED · ${money(s.bounty.amount)} bounty` : '', kind: 'turn', color: this.color(p), avatar: this.ui.pimg(p), duration: p.isAI ? 0.75 : 0.95 });
-    this.ui.feed(`${this.name(p)}'s turn`, this.color(p));
+    await this.ui.banner({ title: this.isLocal(p) ? `${p.name}, תורך!` : `התור של ${p.name}`, subtitle: p.inJail ? '🔒 בכלא' : s.bounty?.playerId === p.id ? `🎯 מבוקש · פרס של ${money(s.bounty.amount)}` : '', kind: 'turn', color: this.color(p), avatar: this.ui.pimg(p), duration: p.isAI ? 0.75 : 0.95 });
+    this.ui.feed(`התור של ${this.name(p)}`, this.color(p));
   }
 
   async rollDice(p, dice, { jail = false } = {}) {
@@ -357,16 +357,16 @@ export class Presenter {
     audio.play('pop', { pitch: 0.8 + total * 0.05 });
     if (dice[0] === dice[1]) {
       this.fx.confetti(c, { count: 40, speed: 3 });
-      this.labels.float('DOUBLES!', c.clone().add(V(0, 0.8, 0)), 'float-money gold', { life: 1.6, rise: 70 });
+      this.labels.float('דאבל!', c.clone().add(V(0, 0.8, 0)), 'float-money gold', { life: 1.6, rise: 70 });
       audio.play('sparkle');
     }
     void pts;
     await wait(0.9);
-    this.ui.feed(`${this.name(p)} rolled <b>${dice[0]} + ${dice[1]}</b>${dice[0] === dice[1] ? ' — doubles!' : ''}${jail ? ' in the Slammer' : ''}`, this.color(p));
+    this.ui.feed(`${this.name(p)} הטיל <b>${dice[0]} + ${dice[1]}</b>${dice[0] === dice[1] ? ' · דאבל!' : ''}${jail ? ' בכלא' : ''}`, this.color(p));
   }
 
   async doublesAgain(p) {
-    await this.ui.banner({ title: 'DOUBLES!', subtitle: 'Roll again', icon: '🎲', color: this.color(p), duration: 0.8 });
+    await this.ui.banner({ title: 'דאבל!', subtitle: 'הטל שוב', icon: '🎲', color: this.color(p), duration: 0.8 });
   }
 
   async movePawn(p, from, steps, { salary = 0 } = {}) {
@@ -394,10 +394,10 @@ export class Presenter {
       if (idx === 0 && salary && dirn > 0) {
         const gp = pawn.root.position.clone().add(V(0, 1.2, 0));
         this.fx.coinFountain(gp, 16);
-        this.labels.float(`+${money(salary)} PAYDAY`, gp, 'float-money up', { life: 1.8, rise: 80 });
+        this.labels.float(`+${money(salary)} משכורת`, gp, 'float-money up', { life: 1.8, rise: 80 });
         audio.play('cash');
         this.ui.syncPlayers(this.state);
-        this.ui.feed(`${this.name(p)} passed PAYDAY: <b>+${money(salary)}</b>`, '#1fcf86');
+        this.ui.feed(`${this.name(p)} עבר ביום משכורת: <b>+${money(salary)}</b>`, '#1fcf86');
       }
       if (!last) this.fx.dust(pawn.root.position.clone(), 3, 0.35);
     }
@@ -425,7 +425,7 @@ export class Presenter {
 
   async homeTurf(p, idx) {
     const pawn = this.pawnOf(p);
-    this.labels.float('HOME TURF', this.headPos(p), 'float-text', { life: 1.4 });
+    this.labels.float('בבית!', this.headPos(p), 'float-text', { life: 1.4 });
     pawn.celebrate();
     audio.play('sparkle', { vol: 0.5 });
     await wait(0.9);
@@ -463,14 +463,14 @@ export class Presenter {
     if (amount >= 150 || opts.big) audio.play('cash');
     this.syncPlayers();
     if (vaultTouched) this.ui.setVault(s.vault, true);
-    const nm = (x) => (x === 'bank' ? 'the bank' : x === 'vault' ? 'the Vault' : this.name(x));
+    const nm = (x) => (x === 'bank' ? 'הבנק' : x === 'vault' ? 'הכספת' : this.name(x));
     this.ui.feed(`${nm(from)} → ${nm(to)} <b>${money(amount)}</b> <span style="opacity:.7">${reason || ''}</span>`, isP(from) ? this.color(from) : isP(to) ? this.color(to) : '#ffc83d');
-    if (opts.big && isP(from)) await this.ui.banner({ title: reason?.toUpperCase() || 'OUCH!', subtitle: `${from.name} pays ${money(amount)}`, color: '#ff4d5e', icon: '💸', duration: 0.9 });
+    if (opts.big && isP(from)) await this.ui.banner({ title: reason?.toUpperCase() || 'אאוץ׳!', subtitle: `${from.name} משלם ${money(amount)}`, color: '#ff4d5e', icon: '💸', duration: 0.9 });
     await wait(opts.quick ? 0.1 : 0.35);
   }
 
   async cannotPay(p, amount, reason) {
-    this.ui.toast(`${p.name} can't cover ${money(amount)}!`, 'bad');
+    this.ui.toast(`${p.name} לא יכול לכסות ${money(amount)}!`, 'bad');
     await wait(0.6);
   }
 
@@ -481,7 +481,7 @@ export class Presenter {
     await this.tileShot(idx, { dist: 8.5, dur: 0.6 });
     const plot = this.buildings.plotWorld(idx).add(V(0, 0.4, 0));
     const stream = this.fx.coinStream(this.headPos(p), plot, 12, { duration: 0.6, stagger: 0.03 });
-    this.ui.propCard(idx, this.state, { stamp: { text: 'SOLD!', good: true } });
+    this.ui.propCard(idx, this.state, { stamp: { text: 'נמכר!', good: true } });
     audio.play('buy');
     await stream;
     this.fx.pillar(plot.clone().setY(0), this.color(p), 7, 1.3);
@@ -489,8 +489,8 @@ export class Presenter {
     await this.buildings.construct(idx, TILES[idx].type === 'property' ? 0 : -1, this.color(p));
     this.syncPlayers();
     pawn.celebrate();
-    this.labels.float(auction ? `WON AT AUCTION!` : 'SOLD!', plot.clone().add(V(0, 1, 0)), 'float-text', { life: 1.5 });
-    this.ui.feed(`${this.name(p)} bought <b>${TILES[idx].name}</b> for ${money(price ?? TILES[idx].price)}`, this.color(p));
+    this.labels.float(auction ? 'זכייה במכירה!' : 'נמכר!', plot.clone().add(V(0, 1, 0)), 'float-text', { life: 1.5 });
+    this.ui.feed(`${this.name(p)} קנה את <b>${TILES[idx].name}</b> ב-${money(price ?? TILES[idx].price)}`, this.color(p));
     await wait(0.8);
     this.ui.hidePropCard();
     this.busyCard = false;
@@ -508,12 +508,12 @@ export class Presenter {
     audio.play('sparkle');
     this.labels.float(`${LEVEL_NAMES[ts.level].toUpperCase()}!`, top, 'float-text', { life: 1.5 });
     this.syncPlayers();
-    this.ui.feed(`${this.name(p)} upgraded <b>${TILES[idx].name}</b> → ${LEVEL_NAMES[ts.level]}${free ? ' (free!)' : ''}`, this.color(p));
+    this.ui.feed(`${this.name(p)} שדרג את <b>${TILES[idx].name}</b> ל${LEVEL_NAMES[ts.level]}${free ? ' (בחינם!)' : ''}`, this.color(p));
     if (ts.level === CONFIG.maxLevel) {
       this.fx.firework(top.clone());
       this.fx.firework(top.clone().add(V(1, 0, 1)));
       this.cam.shake(0.2);
-      await this.ui.banner({ title: 'LANDMARK!', subtitle: `${TILES[idx].name} is now iconic`, icon: '🏆', color: this.color(p), duration: 1.3 });
+      await this.ui.banner({ title: 'ציון דרך!', subtitle: `${TILES[idx].name} הפך לאייקון`, icon: '🏆', color: this.color(p), duration: 1.3 });
     } else await wait(0.35);
   }
 
@@ -523,7 +523,7 @@ export class Presenter {
     this.labels.float(`+${money(refund)}`, this.buildings.topOf(idx), 'float-money up', { life: 1.4 });
     audio.play('coin');
     this.syncPlayers();
-    this.ui.feed(`${this.name(p)} sold an upgrade on <b>${TILES[idx].name}</b> (+${money(refund)})`, this.color(p));
+    this.ui.feed(`${this.name(p)} מכר שדרוג ב<b>${TILES[idx].name}</b> (+${money(refund)})`, this.color(p));
   }
 
   async mortgage(idx, p, on, value) {
@@ -533,7 +533,7 @@ export class Presenter {
     this.fx.dust(this.buildings.plotWorld(idx), 10, 0.6);
     this.labels.float(`${on ? '+' : '−'}${money(value)}`, this.buildings.topOf(idx), `float-money ${on ? 'up' : 'down'}`, { life: 1.4 });
     this.syncPlayers();
-    this.ui.feed(`${this.name(p)} ${on ? 'mortgaged' : 'unmortgaged'} <b>${TILES[idx].name}</b>`, this.color(p));
+    this.ui.feed(`${this.name(p)} ${on ? 'משכן את' : 'פדה את'} <b>${TILES[idx].name}</b>`, this.color(p));
     await wait(0.4);
   }
 
@@ -554,17 +554,17 @@ export class Presenter {
     this.pawnOf(owner).angry();
     this.pawnOf(p).celebrate();
     this.syncPlayers();
-    this.ui.feed(`${this.name(p)} pulled a <b>hostile takeover</b> of ${TILES[idx].name} from ${this.name(owner)}!`, '#7b5cff');
-    await this.ui.banner({ title: 'HOSTILE TAKEOVER!', subtitle: `${p.name} seizes ${TILES[idx].name} for ${money(price)}`, icon: '🏢', color: '#7b5cff', duration: 1.4 });
+    this.ui.feed(`${this.name(p)} ביצע <b>השתלטות עוינת</b> על ${TILES[idx].name} מידי ${this.name(owner)}!`, '#7b5cff');
+    await this.ui.banner({ title: 'השתלטות עוינת!', subtitle: `${p.name} חוטף את ${TILES[idx].name} ב-${money(price)}`, icon: '🏢', color: '#7b5cff', duration: 1.4 });
   }
 
   async rentDodged(p, owner, idx, amount) {
-    this.labels.float('DODGED!', this.headPos(p), 'float-money up', { life: 1.8 });
+    this.labels.float('התחמק!', this.headPos(p), 'float-money up', { life: 1.8 });
     this.fx.confetti(this.headPos(p), { count: 50, colors: [this.color(p), '#fff'] });
     this.pawnOf(p).celebrate();
     this.pawnOf(owner).angry();
     audio.play('win', { vol: 0.6 });
-    this.ui.feed(`${this.name(p)} won the duel and skipped ${money(amount)} rent!`, this.color(p));
+    this.ui.feed(`${this.name(p)} ניצח בדו-קרב וחסך שכירות של ${money(amount)}!`, this.color(p));
     await wait(1.2);
   }
 
@@ -573,13 +573,13 @@ export class Presenter {
     const { player: p, tile: t, canAfford, state: s } = ctx;
     this.busyCard = true;
     const d = t.district ? DISTRICTS[t.district] : null;
-    const note = d ? `${d.shift === 'day' ? '☀ Day business' : '☾ Night spot'}: rent ×${CONFIG.primeTimeMultiplier} ${d.shift === 'day' ? 'in daylight' : 'after dark'}. ${R.districtOwnedCount(s, p.id, t.district)}/${districtTiles(t.district).length} of ${d.name} owned.` : '';
+    const note = d ? `${d.shift === 'day' ? '☀ עסק יום' : '☾ עסק לילה'}: שכירות ×${CONFIG.primeTimeMultiplier} ${d.shift === 'day' ? 'באור יום' : 'אחרי החשכה'}. יש לך ${R.districtOwnedCount(s, p.id, t.district)} מתוך ${districtTiles(t.district).length} ב${d.name}.` : '';
     return this.ui.propCard(t.index, s, {
       note,
       auto: this.autoOf(auto, 1.0),
       buttons: [
-        { id: 'buy', label: 'Buy it', sub: canAfford ? `You'll have ${money(p.cash - t.price)} left` : `You only have ${money(p.cash)}`, icon: '🏷️', kind: 'primary', cost: money(t.price), disabled: !canAfford, hotkey: 'Space' },
-        { id: 'auction', label: 'Auction Rush', sub: 'Everyone bids — hold your key!', icon: '🔨', kind: 'ghost', hotkey: 'KeyA' },
+        { id: 'buy', label: 'קנה', sub: canAfford ? `יישאר לך ${money(p.cash - t.price)}` : `יש לך רק ${money(p.cash)}`, icon: '🏷️', kind: 'primary', cost: money(t.price), disabled: !canAfford, hotkey: 'Space' },
+        { id: 'auction', label: 'מכירה פומבית', sub: 'כולם מתחרים: החזיקו את המקש!', icon: '🔨', kind: 'ghost', hotkey: 'KeyA' },
       ],
     }).then((r) => { this.busyCard = false; if (r !== 'buy') this.ui.hidePropCard(); return r; });
   }
@@ -588,16 +588,16 @@ export class Presenter {
     const { player: p, owner, tile: t, rent, state: s, takeover, takeoverReason, takeoverPrice, duel, duelLoss } = ctx;
     this.busyCard = true;
     const buttons = [
-      { id: 'pay', label: 'Pay rent', sub: `to ${owner.name}`, icon: '💸', kind: 'ghost', cost: money(rent.amount), hotkey: 'KeyP' },
+      { id: 'pay', label: 'שלם שכירות', sub: `ל${owner.name}`, icon: '💸', kind: 'ghost', cost: money(rent.amount), hotkey: 'KeyP' },
     ];
-    if (duel) buttons.unshift({ id: 'duel', label: 'DUEL for it!', sub: `Win: pay $0 · Lose: pay ${money(duelLoss)}`, icon: '⚔️', kind: 'duel', hotkey: 'KeyD' });
+    if (duel) buttons.unshift({ id: 'duel', label: 'דו-קרב על זה!', sub: `ניצחון: משלמים ₪0 · הפסד: משלמים ${money(duelLoss)}`, icon: '⚔️', kind: 'duel', hotkey: 'KeyD' });
     buttons.push({
-      id: 'takeover', label: 'Hostile takeover', icon: '🏢', kind: 'purple',
-      sub: takeover ? `Seize it from ${owner.name}` : takeoverReason === 'District is protected' ? '🔒 Full district is protected' : takeoverReason === 'Mortgaged' ? 'Not while mortgaged' : `Need ${money(takeoverPrice || 0)}`,
+      id: 'takeover', label: 'השתלטות עוינת', icon: '🏢', kind: 'purple',
+      sub: takeover ? `לחטוף את זה מ${owner.name}` : takeoverReason === 'השכונה מוגנת' ? '🔒 שכונה מלאה מוגנת' : takeoverReason === 'ממושכן' ? 'לא כשהנכס ממושכן' : `צריך ${money(takeoverPrice || 0)}`,
       cost: takeover ? money(takeover) : null, disabled: !takeover,
     });
     let note = '';
-    if (s.bounty?.playerId === owner.id) note = `🎯 <b>${owner.name}</b> has a <b>${money(s.bounty.amount)}</b> bounty. Beat them in a duel to claim it!`;
+    if (s.bounty?.playerId === owner.id) note = `🎯 על הראש של <b>${owner.name}</b> יש פרס של <b>${money(s.bounty.amount)}</b>. נצח אותו בדו-קרב ותיקח אותו!`;
     this.pawnOf(owner).lookAt(this.pawnOf(p).root.position);
     return this.ui.propCard(t.index, s, { buttons, rent, note, auto: this.autoOf(auto, 1.2) })
       .then((r) => { this.busyCard = false; this.ui.hidePropCard(); this.pawnOf(owner).lookAt(null); return r; });
@@ -606,12 +606,12 @@ export class Presenter {
   jailChoice(ctx, auto) {
     const { player: p, options: o } = ctx;
     const opts = [
-      { id: 'roll', label: 'Roll for doubles', sub: `Attempt ${o.turn} of ${o.maxTurns}`, icon: '🎲', kind: 'primary' },
-      { id: 'pay', label: 'Pay bail', sub: 'Into the Vault — then roll normally', icon: '💰', kind: 'ghost', cost: money(o.bail), disabled: !o.canPay },
+      { id: 'roll', label: 'הטל ונסה לקבל דאבל', sub: `ניסיון ${o.turn} מתוך ${o.maxTurns}`, icon: '🎲', kind: 'primary' },
+      { id: 'pay', label: 'שלם ערבות', sub: 'לכספת, ואז מטילים כרגיל', icon: '💰', kind: 'ghost', cost: money(o.bail), disabled: !o.canPay },
     ];
-    if (o.card) opts.push({ id: 'card', label: 'Call your lawyer', sub: 'Use your get-out-free card', icon: '⚖️', kind: 'blue' });
-    if (o.appeal) opts.push({ id: 'appeal', label: 'APPEAL!', sub: 'Duel the richest player — win and walk free', icon: '⚔️', kind: 'duel' });
-    return this.ui.choice({ title: 'In the Slammer', text: `${p.name}, how do you want out?`, player: p, options: opts, auto: this.autoOf(auto, 1.1), clear: true });
+    if (o.card) opts.push({ id: 'card', label: 'התקשר לעורך הדין', sub: 'השתמש בקלף היציאה בחינם', icon: '⚖️', kind: 'blue' });
+    if (o.appeal) opts.push({ id: 'appeal', label: 'ערעור!', sub: 'דו-קרב מול השחקן הכי עשיר: תנצח ותצא חופשי', icon: '⚔️', kind: 'duel' });
+    return this.ui.choice({ title: 'בכלא', text: `${p.name}, איך אתה רוצה לצאת?`, player: p, options: opts, auto: this.autoOf(auto, 1.1), clear: true });
   }
 
   targetChoice(ctx, auto) {
@@ -620,7 +620,7 @@ export class Presenter {
 
   async tradeProposed(offer) {
     const s = this.state;
-    this.ui.feed(`${this.name(s.players[offer.from])} offers ${this.name(s.players[offer.to])} a deal`, '#2fa8ff');
+    this.ui.feed(`${this.name(s.players[offer.from])} מציע עסקה ל${this.name(s.players[offer.to])}`, '#2fa8ff');
   }
 
   tradeResponse(ctx, auto) {
@@ -631,7 +631,7 @@ export class Presenter {
     const s = this.state;
     const a = s.players[offer.from], b = s.players[offer.to];
     if (!ok) {
-      this.ui.toast(`${b.name} turned the deal down`, 'bad');
+      this.ui.toast(`${b.name} דחה את העסקה`, 'bad');
       this.pawnOf(a).sad();
       await wait(0.5);
       return;
@@ -643,8 +643,8 @@ export class Presenter {
     this.pawnOf(a).celebrate();
     this.pawnOf(b).celebrate();
     this.syncPlayers();
-    this.ui.feed(`🤝 ${this.name(a)} and ${this.name(b)} made a deal`, '#1fcf86');
-    await this.ui.banner({ title: 'DEAL!', subtitle: `${a.name} × ${b.name}`, icon: '🤝', color: '#1fcf86', duration: 1.0 });
+    this.ui.feed(`🤝 עסקה נסגרה: ${this.name(a)} × ${this.name(b)}`, '#1fcf86');
+    await this.ui.banner({ title: 'עסקה!', subtitle: `${a.name} × ${b.name}`, icon: '🤝', color: '#1fcf86', duration: 1.0 });
   }
 
   // ───────────────────────────────────────────── human menus
@@ -660,12 +660,12 @@ export class Presenter {
     const buildable = R.ownedBy(s, p.id).filter((i) => R.canBuild(s, p.id, i).ok);
     const others = s.players.filter((o) => !o.bankrupt && o !== p);
     const id = await this.ui.dock(p, [
-      { id: 'build', label: 'Build', icon: '🔨', kind: 'ghost', disabled: !buildable.length, title: buildable.length ? 'Upgrade your lots' : 'Nothing to upgrade right now' },
-      { id: 'trade', label: 'Trade', icon: '🤝', kind: 'ghost', disabled: !others.length },
-      { id: 'deeds', label: 'Deeds', icon: '📜', kind: 'ghost' },
+      { id: 'build', label: 'בנייה', icon: '🔨', kind: 'ghost', disabled: !buildable.length, title: buildable.length ? 'שדרג את המגרשים שלך' : 'אין מה לשדרג כרגע' },
+      { id: 'trade', label: 'עסקה', icon: '🤝', kind: 'ghost', disabled: !others.length },
+      { id: 'deeds', label: 'נכסים', icon: '📜', kind: 'ghost' },
       phase === 'pre'
-        ? { id: 'roll', label: 'ROLL', icon: '🎲', kind: 'primary', primary: true, key: 'SPACE', hotkey: 'Space' }
-        : { id: 'end', label: 'END TURN', icon: '✔', kind: 'go', primary: true, key: 'SPACE', hotkey: 'Space' },
+        ? { id: 'roll', label: 'הטל!', icon: '🎲', kind: 'primary', primary: true, key: 'רווח', hotkey: 'Space' }
+        : { id: 'end', label: 'סיום תור', icon: '✔', kind: 'go', primary: true, key: 'רווח', hotkey: 'Space' },
     ]);
     switch (id) {
       case 'roll': return { type: 'roll' };
@@ -696,7 +696,7 @@ export class Presenter {
     });
     this.overview(0.9);
     const pickP = new Promise((resolve) => { this.tilePick = { allowed, resolve }; });
-    const dockP = this.ui.dock(p, [{ id: 'done', label: 'Done building', icon: '✔', kind: 'go', primary: true, key: 'ESC', hotkey: 'Escape' }], `<span style="font-size:18px">🔨</span> Click a glowing lot to upgrade it · cash <b>${money(p.cash)}</b>`);
+    const dockP = this.ui.dock(p, [{ id: 'done', label: 'סיימתי לבנות', icon: '✔', kind: 'go', primary: true, key: 'ESC', hotkey: 'Escape' }], `<span style="font-size:18px">🔨</span> לחץ על מגרש זוהר כדי לשדרג אותו · כסף: <b>${money(p.cash)}</b>`);
     const r = await Promise.race([pickP.then((i) => ({ i })), dockP.then(() => ({ done: true }))]);
     this.tilePick = null;
     this.board.setMarked([]);
@@ -716,7 +716,7 @@ export class Presenter {
     this.ui.thinking(p);
     await wait(act.type === 'roll' || act.type === 'end' ? 0.45 : 0.7);
     if (act.type === 'end') this.marker.visible = false;
-    if (act.type === 'bankrupt') this.ui.toast(`${p.name} throws in the towel…`, 'bad');
+    if (act.type === 'bankrupt') this.ui.toast(`${p.name} מרים ידיים…`, 'bad');
     this.ui.hideDock();
     return act;
   }
@@ -729,7 +729,7 @@ export class Presenter {
     this.cam.move({ target: pawn.root.position.clone().add(V(0, 0.5, 0)), dist: 9, pitch: 0.5 }, 0.5);
     pawn.shocked();
     this.fx.sparks(this.headPos(p), { count: 20, colors: ['#ff2a3d', '#2a6bff'], speed: 2 });
-    const bannerP = this.ui.banner({ title: 'BUSTED!', subtitle: reason, icon: '🚓', color: '#2f4b8f', duration: 1.2 });
+    const bannerP = this.ui.banner({ title: 'נתפסת!', subtitle: reason, icon: '🚓', color: '#2f4b8f', duration: 1.2 });
     await wait(0.6);
     // yanked up and dropped into the cell
     const from = pawn.root.position.clone();
@@ -756,13 +756,13 @@ export class Presenter {
     this.settleAll();
     await bannerP;
     this.syncPlayers();
-    this.ui.feed(`${this.name(p)} was thrown in the Slammer 🔒`, '#ff4d5e');
+    this.ui.feed(`${this.name(p)} נזרק לכלא 🔒`, '#ff4d5e');
     await wait(0.4);
   }
 
   async release(p, how) {
     const pawn = this.pawnOf(p);
-    const txt = { card: 'Lawyer to the rescue! ⚖️', bail: 'Bail paid.', appeal: 'Appeal granted!', doubles: 'Doubles — FREE!', served: 'Time served.' }[how] || 'Free!';
+    const txt = { card: 'עורך הדין הציל את המצב! ⚖️', bail: 'הערבות שולמה.', appeal: 'הערעור התקבל!', doubles: 'דאבל: חופשי!', served: 'סיים לרצות את העונש.' }[how] || 'חופשי!';
     this.ui.toast(`${p.name}: ${txt}`, 'good');
     audio.play('unlock');
     await pawn.hopTo(this.restSpot(p), { height: 0.9, duration: 0.45 });
@@ -781,7 +781,7 @@ export class Presenter {
   async flashMob(p, movers) {
     const target = this.pawnOf(p);
     this.overview(1.0);
-    await this.ui.banner({ title: 'FLASH MOB!', icon: '🕺', color: '#ff6fae', duration: 0.9 });
+    await this.ui.banner({ title: 'פלאש מוב!', icon: '🕺', color: '#ff6fae', duration: 0.9 });
     const saved = movers.map((m) => m.pos);
     movers.forEach((m) => { m.pos = p.pos; });
     const jobs = movers.map(async (m, k) => {
@@ -804,11 +804,11 @@ export class Presenter {
     this.overview(0.8);
     await wait(0.8);
     audio.play('impact');
-    await this.ui.banner({ title: 'EARTHQUAKE!', icon: '🌋', color: '#c2410c', duration: 0.8 });
+    await this.ui.banner({ title: 'רעידת אדמה!', icon: '🌋', color: '#c2410c', duration: 0.8 });
     for (let k = 0; k < 6; k++) { this.cam.shake(0.6); audio.play('impact', { vol: 0.5, delay: 0 }); await wait(0.25); }
     for (const pawn of this.pawns.values()) pawn.shocked();
     await Promise.all(hits.map((i) => this.buildings.crumble(i, this.state.tiles[i].level - 1)));
-    if (!hits.length) this.ui.toast('Phew — nothing was tall enough to fall.', 'good');
+    if (!hits.length) this.ui.toast('פיו! שום דבר לא היה מספיק גבוה כדי ליפול.', 'good');
     await wait(0.4);
   }
 
@@ -838,10 +838,10 @@ export class Presenter {
       const top = this.buildings.topOf(i);
       if (mult > 1) {
         this.fx.sparks(top, { count: 40, colors: ['#ff9a3c', '#ffd166', '#ff4d5e'], speed: 3, up: 2 });
-        this.labels.float('🔥 TRENDING', top, 'float-text', { life: 1.8 });
+        this.labels.float('🔥 בטרנד', top, 'float-text', { life: 1.8 });
       } else {
         this.fx.dust(top, 16, 1, '#8a8a99');
-        this.labels.float('📉 SCANDAL', top, 'float-text', { life: 1.8 });
+        this.labels.float('📉 שערורייה', top, 'float-text', { life: 1.8 });
       }
     }
     audio.play(mult > 1 ? 'crowd' : 'lose');
@@ -851,7 +851,7 @@ export class Presenter {
 
   async hypeEnded(d) {
     this.ui.setHype(this.state.hype);
-    this.ui.toast(`${DISTRICTS[d].name} is back to normal`);
+    this.ui.toast(`${DISTRICTS[d].name} חזרה לשגרה`);
   }
 
   async timeChanged(phase, why) {
@@ -864,10 +864,10 @@ export class Presenter {
     audio.setMood(phase === 3 ? 'night' : 'board');
     this.ui.setClock(this.state.round, phase);
     const info = [
-      { t: 'GOOD MORNING', s: '☀ Day businesses now charge 1.5× rent', i: '🌅', c: '#ff9a5a' },
-      { t: 'HIGH NOON', s: '☀ Day businesses still at 1.5× rent', i: '☀️', c: '#2fa8ff' },
-      { t: 'DUSK FALLS', s: '☾ Night spots now charge 1.5× rent', i: '🌇', c: '#ff6f61' },
-      { t: 'NIGHTFALL', s: '☾ Night spots at 1.5× — the neon is on', i: '🌙', c: '#3b3fa6' },
+      { t: 'בוקר טוב', s: '☀ עסקי היום גובים עכשיו שכירות ×1.5', i: '🌅', c: '#ff9a5a' },
+      { t: 'צהריים', s: '☀ עסקי היום עדיין גובים ×1.5', i: '☀️', c: '#2fa8ff' },
+      { t: 'השמש שוקעת', s: '☾ עסקי הלילה גובים עכשיו שכירות ×1.5', i: '🌇', c: '#ff6f61' },
+      { t: 'ירד הלילה', s: '☾ עסקי הלילה ב-×1.5, הניאונים דולקים', i: '🌙', c: '#3b3fa6' },
     ][phase];
     if (phase === 3) {
       // nightfall fireworks over the plaza
@@ -889,29 +889,29 @@ export class Presenter {
 
   async newRound(round) {
     this.ui.setClock(round, this.state.timePhase);
-    this.ui.feed(`— Round ${round} —`, '#1d1838');
+    this.ui.feed(`— סיבוב ${round} —`, '#1d1838');
     this.updateStatue();
   }
 
   async bountyUpdate(bounty, isNew) {
     this.syncPlayers();
-    if (!bounty) { this.ui.toast('The bounty was lifted — the race is close again'); return; }
+    if (!bounty) { this.ui.toast('הפרס בוטל: המרוץ שוב צמוד'); return; }
     const p = this.state.players[bounty.playerId];
     if (isNew) {
       const pawn = this.pawnOf(p);
       this.cam.unfollow();
       await this.cam.move({ target: pawn.root.position.clone().add(V(0, 1, 0)), dist: 9, pitch: 0.4, yaw: sideYaw(tileSide(p.pos)) + 0.4 }, 1.0);
       audio.play('duel', { vol: 0.5 });
-      await this.ui.banner({ title: 'WANTED!', subtitle: `${p.name} is running away with it · ${money(bounty.amount)} bounty — beat them in a duel!`, icon: '🎯', color: '#a0141e', duration: 1.8 });
+      await this.ui.banner({ title: 'מבוקש!', subtitle: `${p.name} בורח לכולם · פרס של ${money(bounty.amount)}, נצחו אותו בדו-קרב!`, icon: '🎯', color: '#a0141e', duration: 1.8 });
     } else {
-      this.ui.toast(`🎯 Bounty on ${p.name} grows to ${money(bounty.amount)}`);
+      this.ui.toast(`🎯 הפרס על ${p.name} עלה ל-${money(bounty.amount)}`);
     }
   }
 
   async bountyClaimed(winner, loser, amt) {
     this.syncPlayers();
     audio.play('win');
-    await this.ui.banner({ title: 'BOUNTY CLAIMED!', subtitle: `${winner.name} takes down ${loser.name} · +${money(amt)}`, icon: '🎯', color: this.color(winner), duration: 1.5 });
+    await this.ui.banner({ title: 'הפרס נגבה!', subtitle: `${winner.name} הפיל את ${loser.name} · +${money(amt)}`, icon: '🎯', color: this.color(winner), duration: 1.5 });
   }
 
   // ───────────────────────────────────────────── bankruptcy & end
@@ -923,7 +923,7 @@ export class Presenter {
     await pawn.flop();
     pawn.setGray(true);
     this.cam.shake(0.4);
-    await this.ui.banner({ title: 'BANKRUPT!', subtitle: creditor ? `Everything goes to ${creditor.name}` : 'Everything goes back to the bank', icon: '💥', color: '#ff4d5e', duration: 1.5 });
+    await this.ui.banner({ title: 'פשיטת רגל!', subtitle: creditor ? `הכול עובר ל${creditor.name}` : 'הכול חוזר לבנק', icon: '💥', color: '#ff4d5e', duration: 1.5 });
     if (!creditor) {
       await this.overview(0.8);
       for (const i of props) { this.buildings.crumble(i, -1); await wait(0.12); }
@@ -931,7 +931,7 @@ export class Presenter {
     }
     await tween({ duration: 0.8, ease: Ease.inBack, onUpdate: (t, e) => { pawn.root.scale.setScalar(Math.max(0.01, 1 - e)); } });
     pawn.root.visible = false;
-    this.ui.feed(`💥 ${this.name(p)} went bankrupt`, '#ff4d5e');
+    this.ui.feed(`💥 ${this.name(p)} פשט רגל`, '#ff4d5e');
   }
 
   async gameOver(winner, standings) {
@@ -973,7 +973,7 @@ export class Presenter {
   async runHeist(p, pot, net = null) {
     const pawn = this.pawnOf(p);
     this.cam.unfollow();
-    await this.ui.banner({ title: 'THE HEIST', subtitle: `${money(pot)} in the Vault`, icon: '🦹', color: '#20588f', duration: 1.1 });
+    await this.ui.banner({ title: 'השוד', subtitle: `${money(pot)} בכספת`, icon: '🦹', color: '#20588f', duration: 1.1 });
     const vp = this.board.vaultTop.clone();
     await this.cam.move({ target: vp.clone().add(V(0, -1.6, 0)), dist: 8.5, pitch: 0.35, yaw: Math.PI * 0.2 }, 1.2, Ease.inOutCubic);
     const cracked = await runHeist({
@@ -989,11 +989,11 @@ export class Presenter {
       this.fx.coinFountain(vp.clone(), 40);
       this.fx.firework(vp.clone());
       audio.play('win');
-      await this.ui.banner({ title: 'JACKPOT!', subtitle: `${p.name} cleans out the Vault`, icon: '💰', color: '#ffb31f', duration: 1.3 });
+      await this.ui.banner({ title: 'ג׳קפוט!', subtitle: `${p.name} מרוקן את הכספת`, icon: '💰', color: '#ffb31f', duration: 1.3 });
     } else if (cracked === 0) {
       audio.play('alarm');
       this.cam.shake(0.3);
-      await this.ui.banner({ title: 'ALARM!', subtitle: 'The cops were waiting…', icon: '🚨', color: '#ff2a3d', duration: 1.2 });
+      await this.ui.banner({ title: 'אזעקה!', subtitle: 'השוטרים חיכו…', icon: '🚨', color: '#ff2a3d', duration: 1.2 });
     }
     this.cam.follow(pawn.root, V(0, 0.4, 0));
     return cracked;
@@ -1016,22 +1016,22 @@ export class Presenter {
     audio.setMood('duel');
     audio.play('duel');
     this.stage.grade.uniforms.uDesat.value = 0.35;
-    await this.ui.banner({ title: 'DUEL!', icon: '⚔️', color: '#e8203a', duration: 0.8 });
+    await this.ui.banner({ title: 'דו-קרב!', icon: '⚔️', color: '#e8203a', duration: 0.8 });
     this.stage.grade.uniforms.uDesat.value = 0;
     pa.lookAt(null); pb.lookAt(null);
 
     const humans = [a, b].filter((x) => !x.isAI).length;
     const controls = net ? net.controls : humans === 2 ? [DUEL_KEYS.left, DUEL_KEYS.right] : [a.isAI ? null : DUEL_KEYS.solo, b.isAI ? null : DUEL_KEYS.solo];
     const keyHTML = (c, i) => {
-      if (!c) return '<span class="kbd">CPU</span>';
-      const move = G.meta.id === 'sumo' ? `<span class="kbd">${c.label.move}</span> move · ` : '';
-      return `${move}<span class="kbd">${c.label.action}</span> action`;
+      if (!c) return '<span class="kbd">מחשב</span>';
+      const move = G.meta.id === 'sumo' ? `<span class="kbd">${c.label.move}</span> תזוזה · ` : '';
+      return `${move}<span class="kbd">${c.label.action}</span> פעולה`;
     };
     let stake = '';
-    if (ctx.reason === 'rent') stake = `Win: pay $0 · Lose: pay ${money(ctx.stake * CONFIG.duelLossMultiplier)}`;
-    else if (ctx.reason === 'appeal') stake = 'Win and walk out of the Slammer';
-    else if (ctx.stake) stake = `${money(ctx.stake)} on the line`;
-    if (s.bounty && (s.bounty.playerId === a.id || s.bounty.playerId === b.id)) stake += ` · 🎯 ${money(s.bounty.amount)} bounty!`;
+    if (ctx.reason === 'rent') stake = `ניצחון: משלמים ₪0 · הפסד: משלמים ${money(ctx.stake * CONFIG.duelLossMultiplier)}`;
+    else if (ctx.reason === 'appeal') stake = 'תנצח ותצא מהכלא';
+    else if (ctx.stake) stake = `${money(ctx.stake)} על הכף`;
+    if (s.bounty && (s.bounty.playerId === a.id || s.bounty.playerId === b.id)) stake += ` · 🎯 פרס של ${money(s.bounty.amount)}!`;
     const vs = this.ui.vs({ a, b, game: G.meta, stake, keysA: keyHTML(controls[0]), keysB: keyHTML(controls[1]), reason: ctx.reason });
     audio.play('impact', { delay: 0.35 });
     await wait(3.4, true);
@@ -1054,7 +1054,7 @@ export class Presenter {
     if (net) await net.ready();
     if (G.meta.countdown) {
       for (const n of ['3', '2', '1']) { this.ui.duelHud.big(n); audio.play('beep'); await wait(0.62, true); }
-      this.ui.duelHud.big('GO!');
+      this.ui.duelHud.big('יאללה!');
       audio.play('go');
       setTimeout(() => this.ui.duelHud.big(''), 450);
     }
@@ -1063,7 +1063,7 @@ export class Presenter {
     await g.finish(w);
     const winner = w === 0 ? a : b;
     clock.slowmo = 0.35;
-    this.ui.duelHud.big(`${winner.name.toUpperCase()} WINS!`, '', ctx.reason === 'rent' ? (winner === a ? 'Rent dodged!' : `${a.name} pays double!`) : '');
+    this.ui.duelHud.big(`${winner.name} מנצח!`, '', ctx.reason === 'rent' ? (winner === a ? 'חמק מהשכירות!' : `${a.name} משלם כפול!`) : '');
     audio.play('win');
     await wait(0.7, true);
     clock.slowmo = 1;
@@ -1083,7 +1083,7 @@ export class Presenter {
     const wp = this.pawnOf(winner);
     this.cam.move({ target: wp.root.position.clone().add(V(0, 0.6, 0)), dist: 8, pitch: 0.45 }, 0.01);
     await this.ui.wipe([], 'out');
-    this.ui.feed(`⚔️ ${this.name(winner)} won the ${G.meta.name} duel`, this.color(winner));
+    this.ui.feed(`⚔️ ${this.name(winner)} ניצח בדו-קרב ${G.meta.name}`, this.color(winner));
     return winner.id;
   }
 
@@ -1111,13 +1111,13 @@ export class Presenter {
     this.cam.move({ target: mid.setY(0.5), dist: Math.max(9, far * 1.1), pitch: 0.6 }, 0.7);
     audio.play('duel', { vol: 0.5 });
     const el = $(`<div class="modal glass" style="width:min(520px,92vw);text-align:center">
-      <div style="font:800 12px var(--font);letter-spacing:.18em;color:var(--ink-3)">CPU DUEL · ${G.meta.icon} ${G.meta.name.toUpperCase()}</div>
-      <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:12px 0">
+      <div style="font:800 12px var(--font);color:var(--ink-3)">דו-קרב מחשבים · ${G.meta.icon} ${G.meta.name}</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:12px 0;direction:ltr">
         <div><img src="${this.ui.pimg(a)}" style="width:84px;height:84px;border-radius:22px;background:${a.color}"><div style="font:800 14px var(--font)">${a.name}</div></div>
         <div style="font:400 44px var(--display)">VS</div>
         <div><img src="${this.ui.pimg(b)}" style="width:84px;height:84px;border-radius:22px;background:${b.color}"><div style="font:800 14px var(--font)">${b.name}</div></div>
       </div>
-      <div style="position:relative;height:18px;border-radius:12px;background:${b.color};overflow:hidden"><i class="qbar" style="position:absolute;left:0;top:0;bottom:0;width:50%;background:${a.color};transition:width .25s cubic-bezier(.2,1.4,.4,1)"></i></div>
+      <div style="position:relative;height:18px;border-radius:12px;background:${b.color};overflow:hidden;direction:ltr"><i class="qbar" style="position:absolute;left:0;top:0;bottom:0;width:50%;background:${a.color};transition:width .25s cubic-bezier(.2,1.4,.4,1)"></i></div>
       <div class="qres" style="font:400 30px var(--display);margin-top:12px;min-height:36px"></div></div>`);
     const ov = this.ui.overlay(el, { clear: true });
     const bar = el.querySelector('.qbar');
@@ -1128,13 +1128,13 @@ export class Presenter {
       await wait(0.2);
     }
     bar.style.width = aWins ? '100%' : '0%';
-    el.querySelector('.qres').textContent = `${winner.name} wins!`;
+    el.querySelector('.qres').textContent = `${winner.name} מנצח!`;
     audio.play('win', { vol: 0.6 });
     (aWins ? pa : pb).celebrate();
     (aWins ? pb : pa).sad();
     await wait(1.3);
     await ov.close();
-    this.ui.feed(`⚔️ ${this.name(winner)} won a CPU duel (${G.meta.name})`, this.color(winner));
+    this.ui.feed(`⚔️ ${this.name(winner)} ניצח בדו-קרב מחשבים (${G.meta.name})`, this.color(winner));
     return winner.id;
   }
 }

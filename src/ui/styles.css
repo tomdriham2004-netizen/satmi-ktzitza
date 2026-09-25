@@ -17,8 +17,9 @@
   --purple: #7b5cff;
   --r: 22px;
   --shadow: 0 22px 44px -18px rgba(38, 20, 80, 0.5), 0 3px 10px -4px rgba(38, 20, 80, 0.25);
-  --font: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
-  --display: 'Lilita One', 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  /* Latin keeps the original faces; Hebrew falls through to Rubik / Secular One */
+  --font: 'Bricolage Grotesque Variable', 'Rubik Variable', 'Bricolage Grotesque', system-ui, sans-serif;
+  --display: 'Lilita One', 'Secular One', 'Bricolage Grotesque Variable', system-ui, sans-serif;
   --ease-pop: cubic-bezier(0.2, 1.5, 0.35, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -638,3 +639,64 @@ button { font-family: inherit; }
 .map-card:hover { transform: translateY(-2px); }
 .map-card.on { border-color: var(--ink); background: #fff; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12); }
 .lobby .maps { margin: 6px 0 10px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   HEBREW / RTL — the page is dir="rtl"; mirror the HUD so it reads from
+   the right. Duel screens stay physically left/right: the left player
+   plays on the left of the keyboard.
+   ═══════════════════════════════════════════════════════════════════ */
+* { letter-spacing: 0 !important; }
+.lobby .code .big, .kbd { letter-spacing: 0.08em !important; }
+
+/* HUD corners */
+#players { left: auto; right: 18px; }
+.pcard { padding: 8px 8px 8px 12px; transform-origin: right center; }
+.pcard::before { left: auto; right: 0; }
+.pcard.active { transform: scale(1.07) translateX(-6px); }
+@keyframes cardPulse { 40% { transform: scale(1.1) translateX(-6px); } }
+.pcard .stamp, .pcard .delta { right: auto; left: 12px; }
+#menubar { right: auto; left: 18px; }
+#feed { left: auto; right: 18px; }
+.feed-item { padding: 7px 8px 7px 12px; }
+.feed-item.old { transform: translateX(20px); }
+@keyframes feedIn { from { transform: translateX(30px) scale(0.9); opacity: 0; } }
+#propcard { right: auto; left: 22px; }
+#propcard.away { transform: translateY(-50%) translateX(-120%) rotate(-6deg); }
+#emotes { right: auto; left: 18px; }
+.pill { padding: 8px 10px 8px 16px; }
+.hype-chip { padding: 6px 8px 6px 12px; }
+.thinking { padding: 6px 6px 6px 16px; }
+#dock .who { padding: 0 2px 0 8px; }
+
+/* buttons: label on the start side, price pushed to the far (left) end */
+.btn .lbl { text-align: start; }
+.deed .actions .btn .cost, .modal .choices .btn .cost { margin-left: 0; margin-right: auto; }
+
+/* tables & lists */
+.rent-table td:last-child { text-align: left; }
+.rent-table tr.cur td:first-child { border-radius: 0 8px 8px 0; }
+.rent-table tr.cur td:last-child { border-radius: 8px 0 0 8px; }
+.rent-table .lvl { margin-right: 0; margin-left: 6px; }
+.tile-tip { border-left: 0; border-right: 5px solid var(--tc, #999); }
+.cash-in .money { text-align: left; }
+.standing { text-align: right; }
+.standing .bar { transform-origin: right; }
+.chip { padding: 6px 6px 6px 10px; }
+.trade-partners button { padding: 6px 6px 6px 12px; }
+.lobby .seat { padding: 8px 8px 8px 12px; }
+.lobby .code .link { direction: ltr; text-align: right; }
+
+/* news ticker runs left-to-right for Hebrew */
+.gcard .ticker span { padding-left: 0; padding-right: 100%; animation-name: tickerRtl; }
+@keyframes tickerRtl { to { transform: translateX(100%); } }
+
+/* title screen: menu panel sits on the left now, so darken that side */
+#title { background: linear-gradient(270deg, rgba(14, 10, 40, 0.05) 30%, rgba(14, 10, 40, 0.35)); }
+
+/* duels keep physical sides; the text inside still reads right-to-left */
+#vs, .dh-top { direction: ltr; }
+.vs-half .rl, .vs-half .nm, .vs-half .keys, .dh-plate .nm, .dh-plate .keys, .vs-game { direction: rtl; }
+.vs-half.l .keys { justify-content: flex-end; }
+.vs-half.r .keys { justify-content: flex-start; }
+.vs-half.l .rl, .vs-half.l .nm, .dh-plate .grow { text-align: left; }
+.vs-half.r .rl, .vs-half.r .nm, .dh-plate.r .grow { text-align: right; }

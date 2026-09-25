@@ -17,7 +17,7 @@ import { input } from "../core/input.js";
 import { every } from "../core/tween.js";
 
 export class Minigame {
-  static meta = { id: 'base', name: 'Minigame', icon: '🎮', howto: '', controls: 'action' };
+  static meta = { id: 'base', name: 'מיני-משחק', icon: '🎮', howto: '', controls: 'action' };
 
   constructor(ctx) {
     this.ctx = ctx;
@@ -129,7 +129,7 @@ export class RemoteInput {
     this.isHeld = false;
     this.ax = { x: 0, y: 0 };
     this.reports = [];
-    this.label = label || { move: 'REMOTE', action: 'REMOTE' };
+    this.label = label || { move: 'מרחוק', action: 'מרחוק' };
   }
   feed(m) {
     if (typeof m.p === 'number') this.presses = Math.max(this.presses, m.p);

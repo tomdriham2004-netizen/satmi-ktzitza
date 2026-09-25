@@ -1,6 +1,8 @@
 // BOOMTOWN — boot, title showcase, game lifecycle.
 import "@fontsource-variable/bricolage-grotesque";
 import "@fontsource/lilita-one";
+import "@fontsource-variable/rubik";
+import "@fontsource/secular-one";
 import "./ui/styles.css";
 import * as THREE from "three";
 import { Stage } from "./render/stage.js";
@@ -39,6 +41,10 @@ async function boot() {
       document.fonts.load('400 40px "Lilita One"'),
       document.fonts.load('800 40px "Bricolage Grotesque Variable"'),
       document.fonts.load('700 40px "Bricolage Grotesque Variable"'),
+      // Hebrew faces: board signs are drawn once onto canvases, so they must be ready first
+      document.fonts.load('400 40px "Secular One"', 'בומטאון'),
+      document.fonts.load('800 40px "Rubik Variable"', 'בומטאון'),
+      document.fonts.load('700 40px "Rubik Variable"', 'בומטאון'),
     ]),
     new Promise((r) => setTimeout(r, 2500)),
   ]);
@@ -169,7 +175,7 @@ async function boot() {
     if (!state.over) saveGame(state);
     engine.run().catch((err) => {
       console.error(err);
-      ui.toast(`Something broke: ${err.message}`, 'bad');
+      ui.toast(`משהו נשבר: ${err.message}`, 'bad');
     });
   }
 
@@ -203,7 +209,7 @@ async function boot() {
       (async () => {
         for (;;) {
           const w = await presenter.runDuel({ a: s.players[0], b: s.players[1], game: qp.get('duel'), ctx: { reason: 'rent', stake: 120 } });
-          ui.toast(`Winner: ${s.players[w].name}`, 'good');
+          ui.toast(`המנצח: ${s.players[w].name}`, 'good');
           await wait(2);
         }
       })();
@@ -288,5 +294,5 @@ async function boot() {
 boot().catch((err) => {
   console.error(err);
   const b = document.getElementById('boot');
-  if (b) b.innerHTML = `<div class="boot-logo" style="font-size:28px;text-align:center">Couldn't start BOOMTOWN<br><small style="font-size:16px">${err.message}</small></div>`;
+  if (b) b.innerHTML = `<div class="boot-logo" style="font-size:28px;text-align:center">לא הצלחנו להפעיל את בומטאון<br><small style="font-size:16px">${err.message}</small></div>`;
 });

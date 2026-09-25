@@ -29,7 +29,7 @@ export class NetClient extends EventBus {
     return new Promise((resolve, reject) => {
       const ws = new WebSocket(this.url());
       this.ws = ws;
-      const fail = () => reject(new Error('Could not reach the game server.'));
+      const fail = () => reject(new Error('לא הצלחנו להגיע לשרת המשחק.'));
       ws.addEventListener('open', () => { ws.removeEventListener('error', fail); resolve(); }, { once: true });
       ws.addEventListener('error', fail, { once: true });
       ws.addEventListener('message', (e) => this.onMessage(e));

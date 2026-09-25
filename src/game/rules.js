@@ -1,5 +1,5 @@
 // Pure rule functions over the game state. No side effects, no rendering.
-import { CONFIG, TIME_PHASES } from "./config.js";
+import { CONFIG, TIME_PHASES, LEVEL_NAMES } from "./config.js";
 import { TILES, DISTRICTS, districtTiles, TRANSIT_INDICES, UTILITY_INDICES, OWNABLE_INDICES } from "./board.js";
 
 export const alive = (s) => s.players.filter((p) => !p.bankrupt);
@@ -36,29 +36,29 @@ export function rentFor(s, idx, diceTotal = 7) {
   let amount = 0;
   if (t.type === 'property') {
     amount = t.rent[ts.level];
-    breakdown.push({ label: `Base (${['Kiosk', 'Shop', 'Store', 'Flagship', 'Tower', 'Landmark'][ts.level]})`, value: `$${amount}` });
+    breakdown.push({ label: `בסיס (${LEVEL_NAMES[ts.level]})`, value: `₪${amount}` });
     if (ownsDistrict(s, owner, t.district)) {
       amount *= CONFIG.setRentMultiplier;
-      breakdown.push({ label: 'Full district', value: `×${CONFIG.setRentMultiplier}` });
+      breakdown.push({ label: 'שכונה מלאה', value: `×${CONFIG.setRentMultiplier}` });
     }
     const pt = isPrimeTime(s, t.district);
     const tm = pt === 'prime' ? CONFIG.primeTimeMultiplier : CONFIG.offHoursMultiplier;
     amount *= tm;
-    breakdown.push({ label: pt === 'prime' ? 'Prime time' : 'Off hours', value: `×${tm}`, good: pt === 'prime' });
+    breakdown.push({ label: pt === 'prime' ? 'שעות שיא' : 'שעות מתות', value: `×${tm}`, good: pt === 'prime' });
     const hype = s.hype[t.district];
     if (hype) {
       amount *= hype.mult;
-      breakdown.push({ label: hype.mult > 1 ? 'Trending!' : 'Scandal', value: `×${hype.mult}`, good: hype.mult > 1 });
+      breakdown.push({ label: hype.mult > 1 ? 'בטרנד!' : 'שערורייה', value: `×${hype.mult}`, good: hype.mult > 1 });
     }
   } else if (t.type === 'transit') {
     const n = TRANSIT_INDICES.filter((i) => s.tiles[i].owner === owner).length;
     amount = 25 * Math.pow(2, n - 1);
-    breakdown.push({ label: `${n} transit line${n > 1 ? 's' : ''}`, value: `$${amount}` });
+    breakdown.push({ label: n > 1 ? `${n} קווי תחבורה` : 'קו תחבורה אחד', value: `₪${amount}` });
   } else if (t.type === 'utility') {
     const n = UTILITY_INDICES.filter((i) => s.tiles[i].owner === owner).length;
     const mult = n === 2 ? 10 : 4;
     amount = diceTotal * mult;
-    breakdown.push({ label: `Dice ${diceTotal} × ${mult}`, value: `$${amount}` });
+    breakdown.push({ label: `קוביות ${diceTotal} × ${mult}`, value: `₪${amount}` });
   }
   return { amount: roundRent(amount), breakdown };
 }
@@ -71,30 +71,30 @@ export function buildCost(idx) {
 export function canBuild(s, pid, idx) {
   const t = TILES[idx];
   const ts = s.tiles[idx];
-  if (!ts || t.type !== 'property') return { ok: false, reason: 'Cannot build here' };
-  if (ts.owner !== pid) return { ok: false, reason: 'Not yours' };
-  if (s.settings?.noBuildFirstRound && s.round <= 1) return { ok: false, reason: 'No building in round 1' };
-  if (ts.mortgaged) return { ok: false, reason: 'Mortgaged' };
-  if (ts.level >= CONFIG.maxLevel) return { ok: false, reason: 'Maxed out' };
+  if (!ts || t.type !== 'property') return { ok: false, reason: 'אי אפשר לבנות כאן' };
+  if (ts.owner !== pid) return { ok: false, reason: 'לא שלך' };
+  if (s.settings?.noBuildFirstRound && s.round <= 1) return { ok: false, reason: 'אין בנייה בסיבוב 1' };
+  if (ts.mortgaged) return { ok: false, reason: 'ממושכן' };
+  if (ts.level >= CONFIG.maxLevel) return { ok: false, reason: 'בנוי עד הסוף' };
   if (ts.level >= CONFIG.levelsWithoutSet && !ownsDistrict(s, pid, t.district))
-    return { ok: false, reason: 'Needs full district' };
+    return { ok: false, reason: 'צריך את כל השכונה' };
   const cost = buildCost(idx);
-  if (s.players[pid].cash < cost) return { ok: false, reason: 'Not enough cash', cost };
+  if (s.players[pid].cash < cost) return { ok: false, reason: 'אין מספיק כסף', cost };
   return { ok: true, cost };
 }
 
 export function canSell(s, pid, idx) {
   const ts = s.tiles[idx];
   if (!ts || ts.owner !== pid) return { ok: false };
-  if (ts.level <= 0) return { ok: false, reason: 'Nothing to sell' };
+  if (ts.level <= 0) return { ok: false, reason: 'אין מה למכור' };
   return { ok: true, refund: Math.floor(buildCost(idx) * CONFIG.sellRatio) };
 }
 
 export function canMortgage(s, pid, idx) {
   const ts = s.tiles[idx];
   if (!ts || ts.owner !== pid) return { ok: false };
-  if (ts.mortgaged) return { ok: false, reason: 'Already mortgaged' };
-  if (ts.level > 0) return { ok: false, reason: 'Sell buildings first' };
+  if (ts.mortgaged) return { ok: false, reason: 'כבר ממושכן' };
+  if (ts.level > 0) return { ok: false, reason: 'קודם מוכרים את הבניינים' };
   return { ok: true, value: Math.floor(TILES[idx].price * CONFIG.mortgageRatio) };
 }
 
@@ -102,7 +102,7 @@ export function canUnmortgage(s, pid, idx) {
   const ts = s.tiles[idx];
   if (!ts || ts.owner !== pid || !ts.mortgaged) return { ok: false };
   const cost = Math.ceil(TILES[idx].price * CONFIG.unmortgageRatio);
-  if (s.players[pid].cash < cost) return { ok: false, reason: 'Not enough cash', cost };
+  if (s.players[pid].cash < cost) return { ok: false, reason: 'אין מספיק כסף', cost };
   return { ok: true, cost };
 }
 
@@ -116,10 +116,10 @@ export function canTakeover(s, pid, idx) {
   const t = TILES[idx];
   const ts = s.tiles[idx];
   if (!ts || ts.owner === null || ts.owner === pid) return { ok: false };
-  if (ts.mortgaged) return { ok: false, reason: 'Mortgaged' };
-  if (t.type === 'property' && ownsDistrict(s, ts.owner, t.district)) return { ok: false, reason: 'District is protected' };
+  if (ts.mortgaged) return { ok: false, reason: 'ממושכן' };
+  if (t.type === 'property' && ownsDistrict(s, ts.owner, t.district)) return { ok: false, reason: 'השכונה מוגנת' };
   const price = takeoverPrice(s, idx);
-  if (s.players[pid].cash < price) return { ok: false, reason: 'Not enough cash', price };
+  if (s.players[pid].cash < price) return { ok: false, reason: 'אין מספיק כסף', price };
   return { ok: true, price };
 }
 

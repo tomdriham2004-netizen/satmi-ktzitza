@@ -5,8 +5,8 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
-export const FONT_UI = '"Bricolage Grotesque Variable", "Bricolage Grotesque", system-ui, sans-serif';
-export const FONT_DISPLAY = '"Lilita One", "Bricolage Grotesque Variable", system-ui, sans-serif';
+export const FONT_UI = '"Bricolage Grotesque Variable", "Rubik Variable", "Bricolage Grotesque", system-ui, sans-serif';
+export const FONT_DISPLAY = '"Lilita One", "Secular One", "Bricolage Grotesque Variable", system-ui, sans-serif';
 
 // ───────────────────────────────────────────── materials
 const matCache = new Map();
@@ -136,6 +136,7 @@ export function canvasTex(w, h, draw, o = {}) {
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
   const ctx = c.getContext('2d');
+  ctx.direction = 'rtl'; // Hebrew signs: keep "₪200" and words in reading order
   draw(ctx, w, h);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = o.linear ? THREE.NoColorSpace : THREE.SRGBColorSpace;

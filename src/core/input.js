@@ -51,7 +51,7 @@ export const DUEL_KEYS = {
   },
   solo: {
     up: ['KeyW', 'ArrowUp'], down: ['KeyS', 'ArrowDown'], left: ['KeyA', 'ArrowLeft'], right: ['KeyD', 'ArrowRight'],
-    action: ['Space', 'KeyF', 'Enter'], label: { move: 'WASD / ARROWS', action: 'SPACE' },
+    action: ['Space', 'KeyF', 'Enter'], label: { move: 'WASD / חצים', action: 'רווח' },
   },
 };
 

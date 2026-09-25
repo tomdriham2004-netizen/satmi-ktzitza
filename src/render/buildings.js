@@ -485,8 +485,8 @@ function makeLot(tile) {
     ctx.fillStyle = '#ffffff'; roundRect(ctx, 4, 4, 248, 152, 18); ctx.fill();
     ctx.fillStyle = col; roundRect(ctx, 4, 4, 248, 60, 18); ctx.fill(); ctx.fillRect(4, 40, 248, 24);
     ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-    ctx.font = `400 42px ${FONT_DISPLAY}`; ctx.fillText('FOR SALE', 128, 50);
-    ctx.fillStyle = '#2a2438'; ctx.font = `800 46px ${FONT_UI}`; ctx.fillText(`$${tile.price}`, 128, 122);
+    ctx.font = `400 42px ${FONT_DISPLAY}`; ctx.fillText('למכירה', 128, 50);
+    ctx.fillStyle = '#2a2438'; ctx.font = `800 46px ${FONT_UI}`; ctx.fillText(`₪${tile.price}`, 128, 122);
   });
   const board = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.31), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.6, side: THREE.DoubleSide }));
   board.position.set(0.15, 0.5, 0.38);
@@ -540,7 +540,7 @@ function makeClosed() {
   const a = box(1.2, 0.08, 0.03, wood); a.rotation.z = 0.5; a.position.set(0, 0.3, 0.72);
   const b = box(1.2, 0.08, 0.03, wood); b.rotation.z = -0.5; b.position.set(0, 0.3, 0.73);
   g.add(a, b);
-  const s = signMesh('MORTGAGED', 0.8, 0.18, { bg: '#e8303a', fg: '#fff' });
+  const s = signMesh('ממושכן', 0.8, 0.18, { bg: '#e8303a', fg: '#fff' });
   s.position.set(0, 0.62, 0.75);
   g.add(s);
   return g;

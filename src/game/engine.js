@@ -75,7 +75,7 @@ export class GameEngine {
       if (dbl) {
         doubles++;
         if (doubles === 3) {
-          await this.sendToJail(p, 'Three doubles — speeding!');
+          await this.sendToJail(p, 'שלושה דאבלים ברצף: מהירות מופרזת!');
           break;
         }
       }
@@ -153,7 +153,7 @@ export class GameEngine {
       case 'build': {
         const c = canBuild(s, p.id, idx);
         if (!c.ok) return;
-        await this.pay(p, 'bank', c.cost, 'Construction', { quiet: true });
+        await this.pay(p, 'bank', c.cost, 'בנייה', { quiet: true });
         s.tiles[idx].level++;
         await this.P.build(idx, p);
         return;
@@ -317,7 +317,7 @@ export class GameEngine {
     const bail = CONFIG.jailBail;
     p.jailTurns++;
     if (p.jailTurns > CONFIG.maxJailTurns) {
-      if (!(await this.pay(p, 'vault', bail, 'Bail'))) return { free: false };
+      if (!(await this.pay(p, 'vault', bail, 'ערבות'))) return { free: false };
       await this.release(p, 'served');
       return { free: true };
     }
@@ -337,7 +337,7 @@ export class GameEngine {
       return { free: true };
     }
     if (choice === 'pay' && options.canPay) {
-      await this.pay(p, 'vault', bail, 'Bail');
+      await this.pay(p, 'vault', bail, 'ערבות');
       await this.release(p, 'bail');
       return { free: true };
     }
@@ -345,18 +345,18 @@ export class GameEngine {
       const prosecutor = others.slice().sort((a, b) => netWorth(s, b.id) - netWorth(s, a.id))[0];
       const w = await this.duel(p, prosecutor, { reason: 'appeal' });
       if (w === p.id) { await this.release(p, 'appeal'); return { free: true }; }
-      await this.P.toast(`Appeal denied! ${p.name} stays in the Slammer.`, 'bad');
+      await this.P.toast(`הערעור נדחה! ${p.name} נשאר בכלא.`, 'bad');
       return { free: false };
     }
     const dice = this.rollDice();
     await this.P.rollDice(p, dice, { jail: true });
     if (dice[0] === dice[1]) { await this.release(p, 'doubles'); return { free: true, dice }; }
     if (p.jailTurns >= CONFIG.maxJailTurns) {
-      if (!(await this.pay(p, 'vault', bail, 'Bail'))) return { free: false };
+      if (!(await this.pay(p, 'vault', bail, 'ערבות'))) return { free: false };
       await this.release(p, 'served');
       return { free: true, dice };
     }
-    await this.P.toast(`No doubles. ${p.name} stays put.`, 'bad');
+    await this.P.toast(`אין דאבל. ${p.name} נשאר בפנים.`, 'bad');
     return { free: false };
   }
 
@@ -368,7 +368,7 @@ export class GameEngine {
     if (isOwnable(t)) return this.landOwnable(p, t, dice);
     switch (t.type) {
       case 'go':
-        await this.pay('bank', p, CONFIG.exactPaydayBonus, 'Perfect Payday!');
+        await this.pay('bank', p, CONFIG.exactPaydayBonus, 'יום משכורת מושלם!');
         return;
       case 'tax':
         await this.pay(p, 'vault', t.amount, t.name);
@@ -381,10 +381,10 @@ export class GameEngine {
         await this.heist(p);
         return;
       case 'gotojail':
-        await this.sendToJail(p, 'Busted!');
+        await this.sendToJail(p, 'נתפסת!');
         return;
       default:
-        if (t.type === 'jail') await this.P.toast(`${p.name} is just visiting the Slammer.`);
+        if (t.type === 'jail') await this.P.toast(`${p.name} רק מבקר בכלא.`);
     }
     void s;
   }
@@ -396,7 +396,7 @@ export class GameEngine {
       const canAfford = p.cash >= t.price;
       const choice = await this.ctrl(p).decideBuy({ player: p, tile: t, canAfford, state: s });
       if (choice === 'buy' && canAfford) {
-        await this.pay(p, 'bank', t.price, 'Purchase', { quiet: true });
+        await this.pay(p, 'bank', t.price, 'קנייה', { quiet: true });
         ts.owner = p.id;
         await this.P.purchased(p, t.index, { price: t.price });
       } else {
@@ -406,7 +406,7 @@ export class GameEngine {
     }
     if (ts.owner === p.id) { await this.P.homeTurf(p, t.index); return; }
     const owner = s.players[ts.owner];
-    if (ts.mortgaged) { await this.P.toast(`${t.name} is mortgaged — no rent due.`); return; }
+    if (ts.mortgaged) { await this.P.toast(`${t.name} ממושכן, אין שכירות לשלם.`); return; }
     const diceTotal = dice ? dice[0] + dice[1] : 7;
     const rent = rentFor(s, t.index, diceTotal);
     if (rent.amount <= 0) return;
@@ -421,7 +421,7 @@ export class GameEngine {
     };
     const choice = await this.ctrl(p).decideRent(ctx);
     if (choice === 'takeover' && tk.ok) {
-      const ok = await this.pay(p, owner, tk.price, 'Hostile takeover', { quiet: true });
+      const ok = await this.pay(p, owner, tk.price, 'השתלטות עוינת', { quiet: true });
       if (ok) {
         ts.owner = p.id;
         p.stats.takeovers++;
@@ -434,11 +434,11 @@ export class GameEngine {
       if (w === p.id) { await this.P.rentDodged(p, owner, t.index, rent.amount); return; }
       const amt = rent.amount * CONFIG.duelLossMultiplier;
       p.stats.rentPaid += amt; owner.stats.rentEarned += amt;
-      await this.pay(p, owner, amt, 'Double rent!', { big: true });
+      await this.pay(p, owner, amt, 'שכירות כפולה!', { big: true });
       return;
     }
     p.stats.rentPaid += rent.amount; owner.stats.rentEarned += rent.amount;
-    await this.pay(p, owner, rent.amount, 'Rent');
+    await this.pay(p, owner, rent.amount, 'שכירות');
   }
 
   async auction(idx) {
@@ -454,11 +454,11 @@ export class GameEngine {
     if (res && res.winner != null && res.price > 0) {
       const w = s.players[res.winner];
       const price = Math.min(res.price, w.cash);
-      await this.pay(w, 'bank', price, 'Auction', { quiet: true });
+      await this.pay(w, 'bank', price, 'מכירה פומבית', { quiet: true });
       s.tiles[idx].owner = w.id;
       await this.P.purchased(w, idx, { auction: true, price });
     } else {
-      await this.P.toast('No bids — the lot stays on the market.');
+      await this.P.toast('אין הצעות. המגרש נשאר בשוק.');
     }
   }
 
@@ -476,16 +476,16 @@ export class GameEngine {
   async heist(p) {
     const s = this.state;
     const pot = s.vault;
-    if (pot <= 0) { await this.P.toast('The Vault is empty. Somebody beat you to it.'); return; }
+    if (pot <= 0) { await this.P.toast('הכספת ריקה. מישהו הקדים אותך.'); return; }
     const cracked = await this.P.runHeist(p, pot);
     if (cracked <= 0) {
-      await this.P.toast('ALARM! The cops were waiting.', 'bad');
-      await this.sendToJail(p, 'Heist alarm');
+      await this.P.toast('אזעקה! השוטרים חיכו לך.', 'bad');
+      await this.sendToJail(p, 'אזעקה בשוד');
       return;
     }
     const share = [0, 0.2, 0.5, 1][cracked];
     const amt = Math.max(5, Math.round((pot * share) / 5) * 5);
-    await this.pay('vault', p, amt, cracked === 3 ? 'JACKPOT!' : 'Heist loot', { big: cracked === 3 });
+    await this.pay('vault', p, amt, cracked === 3 ? 'ג׳קפוט!' : 'שלל מהשוד', { big: cracked === 3 });
     p.stats.heists++;
     p.stats.bestHeist = Math.max(p.stats.bestHeist, amt);
     if (s.vault <= 0) { s.vault = CONFIG.vaultSeed; this.P.syncPlayers(); }
@@ -514,7 +514,7 @@ export class GameEngine {
       s.bounty = null;
       winner.stats.bounties++;
       await this.P.bountyClaimed(winner, loser, amt);
-      await this.pay('bank', winner, amt, 'Bounty claimed!', { big: true });
+      await this.pay('bank', winner, amt, 'הפרס נגבה!', { big: true });
     }
     return winnerId;
   }

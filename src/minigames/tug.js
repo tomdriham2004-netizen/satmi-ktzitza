@@ -11,8 +11,8 @@ const LIMIT = 13;      // seconds
 
 export class Tug extends Minigame {
   static meta = {
-    id: 'tug', name: 'Tug of Cash', icon: '🪢', countdown: true,
-    howto: '<b>MASH</b> your action key to haul the rope. Drag your rival into the shark pool — or be ahead when time runs out.',
+    id: 'tug', name: 'משיכת כסף', icon: '🪢', countdown: true,
+    howto: '<b>לחצו מהר</b> על מקש הפעולה כדי למשוך את החבל. גררו את היריב לבריכת הכרישים, או תהיו בהובלה כשהזמן נגמר.',
   };
 
   async build() {
@@ -100,7 +100,7 @@ export class Tug extends Minigame {
     this.rope.rotation.z = Math.PI / 2;
     this.rope.castShadow = true;
     s.add(this.rope);
-    const flagTex = canvasTex(64, 64, (ctx) => { ctx.fillStyle = '#ff4d5e'; ctx.fillRect(0, 0, 64, 64); ctx.fillStyle = '#fff'; ctx.font = '800 40px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('$', 32, 46); });
+    const flagTex = canvasTex(64, 64, (ctx) => { ctx.fillStyle = '#ff4d5e'; ctx.fillRect(0, 0, 64, 64); ctx.fillStyle = '#fff'; ctx.font = '800 40px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('₪', 32, 46); });
     this.flag = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshStandardMaterial({ map: flagTex, side: THREE.DoubleSide }));
     s.add(this.flag);
     this.pos = 0;
@@ -128,7 +128,7 @@ export class Tug extends Minigame {
 
   async intro() {
     this.arena.look(new THREE.Vector3(0.8, 3.4, 8.6), new THREE.Vector3(0, 0.7, 0), 1.5);
-    this.ui.duelHud.big('MASH!', '', 'Pull them into the pool');
+    this.ui.duelHud.big('לחצו!', '', 'תמשכו אותו לבריכה');
     await wait(1.4, true);
     this.ui.duelHud.big('');
   }

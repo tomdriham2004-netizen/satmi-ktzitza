@@ -8,7 +8,7 @@ import { mat, cyl, sphere, cone, torus, box, at, dynamic, stripeMat, signMesh } 
 import { rand, pick } from "../core/rng.js";
 import { input } from "../core/input.js";
 
-const FAKES = ['DRAWBRIDGE!', 'DRAWER!', 'DRAMA!', 'DRAGON!', 'DRAWING…', 'DR… DRUMS!', 'DRIZZLE!', 'DRAFT!'];
+const FAKES = ['שלום!', 'שלוש!', 'שלג!', 'שלולית!', 'שלו…', 'של… שלוק!', 'שולחן!', 'שלב!'];
 
 function cowboyHat() {
   const g = new THREE.Group();
@@ -40,8 +40,8 @@ function cactus(s = 1) {
 
 export class QuickDraw extends Minigame {
   static meta = {
-    id: 'quickdraw', name: 'Quick Draw', icon: '🤠', countdown: false,
-    howto: 'Wait for <b>DRAW!</b> then hit your action key first. Fire on a fake-out and you lose the round. Best of 3.',
+    id: 'quickdraw', name: 'שליפה מהירה', icon: '🤠', countdown: false,
+    howto: 'חכו ל<b>שלוף!</b> ואז לחצו ראשונים על מקש הפעולה. מי שיורה על הטעיה מפסיד בסיבוב. הטוב מ-3.',
   };
 
   async build() {
@@ -98,7 +98,7 @@ export class QuickDraw extends Minigame {
     g.add(at(box(6.4, 2.6, 1.6, wood), 0, 1.3, 0));
     g.add(at(box(3.4, 1.0, 0.3, wood), 0, 3.1, 0.65));
     g.add(at(box(6.6, 0.12, 0.3, trim), 0, 2.62, 0.82));
-    const sign = signMesh('SALOON', 3.0, 0.7, { bg: '#3b2412', fg: '#ffd166', border: '#e8c58a' });
+    const sign = signMesh('סלון', 3.0, 0.7, { bg: '#3b2412', fg: '#ffd166', border: '#e8c58a' });
     sign.position.set(0, 3.1, 0.82);
     g.add(sign);
     // porch roof on posts
@@ -230,17 +230,17 @@ export class QuickDraw extends Minigame {
         this.reported = false;
         this.pawns.forEach((p) => { p.body.rotation.x = 0; p.armPose = false; p.setExpression('neutral'); p.arms.forEach((arm, i) => { arm.rotation.set(0, 0, (i ? 1 : -1) * 0.35); }); });
         a.look(new THREE.Vector3(0, 1.3, 7.2), new THREE.Vector3(0, 1.0, 0), 1.2);
-        ui.big('Steady…', 'fake');
+        ui.big('רגע…', 'fake');
         break;
       case 'fake': ui.big(ev.word, 'fake'); this.audio.play('pop', { pitch: 0.7 }); break;
       case 'hide': ui.big('…', 'fake'); break;
       case 'draw':
         this.drawSeenAt = performance.now();
-        ui.big('DRAW!', 'red');
+        ui.big('שלוף!', 'red');
         this.audio.play('beep', { pitch: 1.8 });
         a.shake(0.15);
         break;
-      case 'slow': this.reported = true; ui.big('TOO SLOW!', 'fake', 'Both of you. Again!'); break;
+      case 'slow': this.reported = true; ui.big('איטיים מדי!', 'fake', 'שניכם. עוד פעם!'); break;
       case 'result': this.reported = true; this.showResult(ev); break;
       default:
     }
@@ -251,7 +251,7 @@ export class QuickDraw extends Minigame {
     const ui = this.ui.duelHud;
     const W = this.pawns[w], L = this.pawns[1 - w];
     if (early != null) {
-      ui.big('TOO EARLY!', 'red', `${this.players[early].name} jumped the gun`);
+      ui.big('מוקדם מדי!', 'red', `${this.players[early].name} ירה לפני הזמן`);
       this.audio.play('error');
       L.shocked();
       await wait(0.3, true);
@@ -264,7 +264,7 @@ export class QuickDraw extends Minigame {
     a.fx.sparks(hand, { count: 26, color: '#ffe38a', speed: 5, size: 0.3, life: 0.5 });
     a.shake(0.45);
     W.setExpression('grin');
-    if (early == null) ui.big(`${this.players[w].name.toUpperCase()}!`, '', `${ms} ms`);
+    if (early == null) ui.big(`${this.players[w].name}!`, '', `${ms} אלפיות שנייה`);
     L.flop();
     a.look(new THREE.Vector3(L.root.position.x * 0.4, 2.2, 6), L.root.position.clone().setY(0.6), 2.5);
     await wait(1.5, true);

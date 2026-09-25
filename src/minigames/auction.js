@@ -21,7 +21,7 @@ export async function runAuction({ ui, audio, idx, bidders, aiValues, holdFn = n
     return input.isDown(k) || (soloHuman && input.isDown('Space'));
   };
   const holding = holdFn || localHold;
-  const label = keyLabel || ((p) => (p.isAI ? null : SEAT_KEYS[p.seat].label + (soloHuman ? ' / SPACE' : '')));
+  const label = keyLabel || ((p) => (p.isAI ? null : SEAT_KEYS[p.seat].label + (soloHuman ? ' / רווח' : '')));
   const el = ui.auction.open({ idx, bidders: bidders.map((p) => ({ p, key: label(p) })) });
   // Pointer hold support (touch / mouse) on the bidder cards — local offline play only
   const cleanups = [];
@@ -57,22 +57,22 @@ export async function runAuction({ ui, audio, idx, bidders, aiValues, holdFn = n
     if (left !== lastBeep && left > 0) {
       lastBeep = left;
       audio.play('beep');
-      ui.auction.status(`HOLD your key to join… <b>${left}</b>`);
+      ui.auction.status(`החזיקו את המקש כדי להצטרף… <b>${left}</b>`);
     }
     for (const p of bidders) {
-      if (p.isAI) setState(p.id, (aiValues[p.id] ?? 0) >= start ? 'holding' : 'idle', (aiValues[p.id] ?? 0) >= start ? 'CPU · in' : 'CPU · passing');
+      if (p.isAI) setState(p.id, (aiValues[p.id] ?? 0) >= start ? 'holding' : 'idle', (aiValues[p.id] ?? 0) >= start ? 'מחשב · בפנים' : 'מחשב · מוותר');
       else setState(p.id, holding(p) ? 'holding' : 'idle');
     }
     return tReady >= 2.7;
   }, true);
-  ui.auction.status('GO!');
+  ui.auction.status('יאללה!');
   audio.play('go');
   const inSet = new Set(bidders.filter((p) => (p.isAI ? (aiValues[p.id] ?? 0) >= start && p.cash >= start : holding(p))).map((p) => p.id));
   for (const p of bidders) if (!inSet.has(p.id)) ui.auction.set(p.id, 'out', 'passed');
   let winner = null;
   let finalPrice = price;
   if (inSet.size === 0) {
-    ui.auction.status('Nobody wants it!');
+    ui.auction.status('אף אחד לא רוצה את זה!');
     await wait(1.2, true);
   } else if (inSet.size === 1) {
     winner = [...inSet][0];
@@ -97,10 +97,10 @@ export async function runAuction({ ui, audio, idx, bidders, aiValues, holdFn = n
       }
       for (const id of dropped) {
         inSet.delete(id);
-        ui.auction.set(id, 'out', `out at $${prev}`);
+        ui.auction.set(id, 'out', `יצא ב-₪${prev}`);
         audio.play('pop', { pitch: 0.7 });
       }
-      ui.auction.status(`${inSet.size} still holding…`);
+      ui.auction.status(`${inSet.size} עדיין מחזיקים…`);
       if (inSet.size === 1) { winner = [...inSet][0]; finalPrice = price; return true; }
       if (inSet.size === 0) {
         winner = dropped[Math.floor(Math.random() * dropped.length)];
@@ -113,9 +113,9 @@ export async function runAuction({ ui, audio, idx, bidders, aiValues, holdFn = n
   if (winner != null) {
     const w = bidders.find((b) => b.id === winner);
     finalPrice = Math.min(finalPrice, w.cash);
-    ui.auction.set(winner, 'win', 'WINNER!');
+    ui.auction.set(winner, 'win', 'זוכה!');
     ui.auction.price(finalPrice);
-    ui.auction.status(`SOLD to <b>${w.name}</b>!`);
+    ui.auction.status(`נמכר ל<b>${w.name}</b>!`);
     audio.play('hammer', { pitch: 0.6 });
     audio.play('cash', { delay: 0.1 });
     await wait(1.5, true);

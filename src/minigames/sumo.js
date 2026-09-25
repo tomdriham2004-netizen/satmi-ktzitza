@@ -13,8 +13,8 @@ const LIMIT = 30;
 
 export class Sumo extends Minigame {
   static meta = {
-    id: 'sumo', name: 'Bumper Brawl', icon: '🥊', countdown: true,
-    howto: '<b>Move</b> to slide around, <b>action</b> to DASH. Shove your rival off the edge. The platform shrinks!',
+    id: 'sumo', name: 'קרב דחיפות', icon: '🥊', countdown: true,
+    howto: '<b>תזוזה</b> כדי להחליק, <b>פעולה</b> כדי לזנק. דחפו את היריב מהקצה. הזירה מתכווצת!',
   };
 
   async build() {

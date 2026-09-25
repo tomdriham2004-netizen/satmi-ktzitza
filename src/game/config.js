@@ -39,10 +39,10 @@ export const CONFIG = {
 };
 
 export const TIME_PHASES = [
-  { id: 'morning', name: 'Morning', icon: '☀', short: 'AM' },
-  { id: 'noon', name: 'High Noon', icon: '☀', short: 'NOON' },
-  { id: 'dusk', name: 'Dusk', icon: '☾', short: 'DUSK' },
-  { id: 'night', name: 'Night', icon: '☾', short: 'NIGHT' },
+  { id: 'morning', name: 'בוקר', icon: '☀', short: 'בוקר' },
+  { id: 'noon', name: 'צהריים', icon: '☀', short: 'צהריים' },
+  { id: 'dusk', name: 'שקיעה', icon: '☾', short: 'ערב' },
+  { id: 'night', name: 'לילה', icon: '☾', short: 'לילה' },
 ];
 
-export const LEVEL_NAMES = ['Kiosk', 'Shop', 'Store', 'Flagship', 'Tower', 'Landmark'];
+export const LEVEL_NAMES = ['קיוסק', 'חנות', 'חנות גדולה', 'חנות דגל', 'מגדל', 'ציון דרך'];

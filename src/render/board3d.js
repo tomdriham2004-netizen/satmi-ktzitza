@@ -105,14 +105,14 @@ export class Board3D {
       ctx.fillText(name, W / 2, H - 58);
       if (t.price) {
         ctx.font = `700 26px ${FONT_UI}`;
-        const pt = `$${t.price}`;
+        const pt = `₪${t.price}`;
         const pw = ctx.measureText(pt).width + 26;
         ctx.fillStyle = t.type === 'property' ? col : '#6a6f86';
         roundRect(ctx, W / 2 - pw / 2, H - 44, pw, 34, 17); ctx.fill();
         ctx.fillStyle = '#fff';
         ctx.fillText(pt, W / 2, H - 18);
       } else {
-        const sub = { news: 'DRAW A CARD', fortune: 'DRAW A CARD', tax: `PAY $${t.amount}` }[t.type] || '';
+        const sub = { news: 'שלוף קלף', fortune: 'שלוף קלף', tax: `שלם ₪${t.amount}` }[t.type] || '';
         ctx.font = `700 22px ${FONT_UI}`;
         ctx.fillStyle = '#4b4462';
         ctx.fillText(sub, W / 2, H - 22);
@@ -123,10 +123,10 @@ export class Board3D {
   cornerArt(t) {
     const S = 420;
     const cfg = {
-      go: { bg: '#ffe9a8', fg: '#1c7a4a', text: 'PAYDAY', sub: `COLLECT $200` },
-      jail: { bg: '#ffd9cf', fg: '#b3303d', text: 'SLAMMER', sub: 'JUST VISITING' },
-      heist: { bg: '#d8f1ff', fg: '#20588f', text: 'THE HEIST', sub: 'CRACK THE VAULT' },
-      gotojail: { bg: '#e3dcff', fg: '#3f3aa6', text: 'BUSTED!', sub: 'GO TO THE SLAMMER' },
+      go: { bg: '#ffe9a8', fg: '#1c7a4a', text: 'יום משכורת', sub: 'קבל ₪200' },
+      jail: { bg: '#ffd9cf', fg: '#b3303d', text: 'הכלא', sub: 'רק ביקור' },
+      heist: { bg: '#d8f1ff', fg: '#20588f', text: 'השוד', sub: 'פרוץ את הכספת' },
+      gotojail: { bg: '#e3dcff', fg: '#3f3aa6', text: 'נתפסת!', sub: 'לך לכלא' },
     }[t.type];
     return canvasTex(S, S, (ctx) => {
       ctx.fillStyle = PAPER; ctx.fillRect(0, 0, S, S);
@@ -181,7 +181,7 @@ export class Board3D {
     arch.add(at(rbox(0.28, 1.9, 0.28, 0.06, green), -1.0, 0.95, 0));
     arch.add(at(rbox(0.28, 1.9, 0.28, 0.06, green), 1.0, 0.95, 0));
     arch.add(at(rbox(2.5, 0.5, 0.36, 0.1, gold), 0, 2.05, 0));
-    const sign = signMesh('PAYDAY', 2.2, 0.42, { bg: '#1f9e62', fg: '#fff6c9', glow: true });
+    const sign = signMesh('יום משכורת', 2.2, 0.42, { bg: '#1f9e62', fg: '#fff6c9', glow: true });
     sign.position.set(0, 2.05, 0.19);
     arch.add(sign);
     const sign2 = sign.clone(); sign2.rotation.y = Math.PI; sign2.position.z = -0.19; arch.add(sign2);
@@ -217,7 +217,7 @@ export class Board3D {
     bakeChildren(cell);
     dynamic(cell);
     b.add(cell);
-    const sign = signMesh('THE SLAMMER', 1.4, 0.3, { bg: '#2d2f3d', fg: '#ffd166' });
+    const sign = signMesh('הכלא', 1.4, 0.3, { bg: '#2d2f3d', fg: '#ffd166' });
     sign.position.set(0, 1.5, 0.72);
     b.add(sign);
     b.add(at(box(0.08, 0.5, 0.08, dark), 0, 1.25, 0.72));
@@ -266,7 +266,7 @@ export class Board3D {
     const b = new THREE.Group();
     b.add(at(box(1.8, 1.1, 1.3, facadeMat('#dfe6f2', 'classic', '#2b3a66')), 0, 0.55, 0));
     b.add(at(box(1.95, 0.14, 1.45, mat('#2f4b8f')), 0, 1.17, 0));
-    const sign = signMesh('POLICE', 1.0, 0.28, { bg: '#2f4b8f', fg: '#fff' });
+    const sign = signMesh('משטרה', 1.0, 0.28, { bg: '#2f4b8f', fg: '#fff' });
     sign.position.set(0, 0.95, 0.66);
     b.add(sign);
     b.rotation.y = Math.PI / 4;
@@ -312,9 +312,9 @@ export class Board3D {
     // screen
     const scr = canvasTex(256, 128, (ctx) => {
       ctx.fillStyle = '#d7263d'; ctx.fillRect(0, 0, 256, 128);
-      ctx.fillStyle = '#fff'; ctx.font = `400 58px ${FONT_DISPLAY}`; ctx.textAlign = 'center'; ctx.fillText('NEWS', 128, 70);
+      ctx.fillStyle = '#fff'; ctx.font = `400 58px ${FONT_DISPLAY}`; ctx.textAlign = 'center'; ctx.fillText('חדשות', 128, 70);
       ctx.fillStyle = '#111'; ctx.fillRect(0, 92, 256, 36);
-      ctx.fillStyle = '#ffd166'; ctx.font = `800 20px ${FONT_UI}`; ctx.fillText('BREAKING • LIVE • BREAKING', 128, 117);
+      ctx.fillStyle = '#ffd166'; ctx.font = `800 20px ${FONT_UI}`; ctx.fillText('מבזק • שידור חי • מבזק', 128, 117);
     });
     const screenM = new THREE.MeshStandardMaterial({ map: scr, emissive: '#fff', emissiveMap: scr, emissiveIntensity: 0.7 });
     const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.45), screenM);
@@ -369,7 +369,7 @@ export class Board3D {
   buildTax(g, t) {
     g.add(at(box(1.2, 0.95, 0.9, facadeMat('#c9ced8', 'classic', '#39445c')), 0, 0.475, -0.15));
     g.add(at(prism(1.3, 0.35, 1.0, mat('#7d8699')), 0, 0.95, -0.15));
-    const sign = signMesh(t.type === 'tax' && t.amount === 100 ? 'LUXURY TAX' : 'TAX OFFICE', 1.0, 0.24, { bg: '#39445c', fg: '#fff' });
+    const sign = signMesh(t.type === 'tax' && t.amount === 100 ? 'מס מותרות' : 'מס הכנסה', 1.0, 0.24, { bg: '#39445c', fg: '#fff' });
     sign.position.set(0, 0.72, 0.31);
     g.add(sign);
     // stacks of paperwork
@@ -389,7 +389,7 @@ export class Board3D {
       tower.position.set(0.35, 0.8, -0.2);
       g.add(tower);
       // anchor sign
-      const s = signMesh('⚓ FERRY', 0.9, 0.24, { bg: '#2a7de1', fg: '#fff', font: FONT_UI, weight: 800 });
+      const s = signMesh('⚓ מעבורת', 0.9, 0.24, { bg: '#2a7de1', fg: '#fff', font: FONT_UI, weight: 800 });
       s.position.set(-0.15, 0.55, 0.26);
       g.add(s);
       // mini ferry bobbing in a pool
@@ -486,7 +486,7 @@ export class Board3D {
       for (const [x, z] of [[-0.3, -0.3], [0.3, -0.3], [-0.3, 0.3], [0.3, 0.3]]) tank.add(at(cyl(0.03, 0.03, 1.2, mat('#8a93a6')), x, 0.6, z));
       tank.add(at(cyl(0.5, 0.5, 0.7, mat('#63b7c9', { physical: true })), 0, 1.5, 0));
       tank.add(at(cone(0.55, 0.3, mat('#4a95a6')), 0, 2.0, 0));
-      const s = signMesh('AQUA', 0.6, 0.2, { bg: 'transparent', fg: '#ffffff' });
+      const s = signMesh('מים', 0.6, 0.2, { bg: 'transparent', fg: '#ffffff' });
       s.position.set(0, 1.5, 0.51);
       tank.add(s);
       tank.position.z = -0.1;
@@ -583,7 +583,7 @@ export class Board3D {
   buildDiceBowl() {
     const R = 3.05;
     const g = new THREE.Group();
-    const felt = this.feltTex('BOOMTOWN', 'DEEDS  ·  DUELS  ·  TOTAL CHAOS');
+    const felt = this.feltTex('בומטאון', 'נכסים  ·  דו-קרבות  ·  כאוס מוחלט');
     this.feltMat = new THREE.MeshStandardMaterial({ map: felt, roughness: 0.95 });
     const floor = new THREE.Mesh(new THREE.CircleGeometry(R, 64), this.feltMat);
     floor.rotation.x = -Math.PI / 2;
@@ -789,7 +789,7 @@ export class Board3D {
     g.add(at(cyl(1.1, 1.25, 0.3, stone, { seg: 8 }), 0, 0.15, 0));
     g.add(at(box(0.9, 0.9, 0.9, stone), 0, 0.75, 0));
     g.add(at(box(1.05, 0.12, 1.05, mat('#d8cdb9')), 0, 1.25, 0));
-    const plaque = signMesh('TOP TYCOON', 0.8, 0.2, { bg: '#ffc83d', fg: '#4a3200' });
+    const plaque = signMesh('הטייקון המוביל', 0.8, 0.2, { bg: '#ffc83d', fg: '#4a3200' });
     plaque.position.set(0, 0.75, 0.46);
     plaque.rotation.y = 0;
     const holder = new THREE.Group();
@@ -995,8 +995,8 @@ export class Board3D {
     }
     this.feltMat.map?.dispose();
     this.feltMat.map = map.id === 'boomtown'
-      ? this.feltTex('BOOMTOWN', 'DEEDS  ·  DUELS  ·  TOTAL CHAOS')
-      : this.feltTex(map.center, 'A  BOOMTOWN  CITY');
+      ? this.feltTex('בומטאון', 'נכסים  ·  דו-קרבות  ·  כאוס מוחלט')
+      : this.feltTex(map.center, 'עיר  של  בומטאון');
     this.feltMat.needsUpdate = true;
     this.ferris.visible = map.landmark === 'ferris';
     for (const g of Object.values(this.landmarks)) g.visible = false;

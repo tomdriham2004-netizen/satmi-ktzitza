@@ -57,7 +57,7 @@ export function attachRooms(httpServer, { path = '/ws', log = () => {} } = {}) {
       }
       if (msg.t === 'join') {
         const r = rooms.get(String(msg.room || '').toUpperCase());
-        if (!r) { send(ws, { t: 'error', code: 'no-room', msg: 'That room does not exist (or it closed).' }); return; }
+        if (!r) { send(ws, { t: 'error', code: 'no-room', msg: 'החדר הזה לא קיים (או שכבר נסגר).' }); return; }
         room = r;
         clearTimeout(room.cleanup);
         const existing = msg.token && [...room.clients.values()].find((c) => c.token === msg.token);
@@ -66,8 +66,8 @@ export function attachRooms(httpServer, { path = '/ws', log = () => {} } = {}) {
           existing.ws = ws;
           me = existing;
         } else {
-          if (room.clients.size >= MAX_CLIENTS) { send(ws, { t: 'error', code: 'full', msg: 'This room is full.' }); room = null; return; }
-          if (!room.clients.get(room.hostId)?.ws) { send(ws, { t: 'error', code: 'no-host', msg: 'The host has left this room.' }); room = null; return; }
+          if (room.clients.size >= MAX_CLIENTS) { send(ws, { t: 'error', code: 'full', msg: 'החדר מלא.' }); room = null; return; }
+          if (!room.clients.get(room.hostId)?.ws) { send(ws, { t: 'error', code: 'no-host', msg: 'המארח עזב את החדר.' }); room = null; return; }
           me = { id: `c${nextId++}`, name: String(msg.name || 'Player').slice(0, 20), token: token(), ws };
           room.clients.set(me.id, me);
         }
@@ -87,7 +87,7 @@ export function attachRooms(httpServer, { path = '/ws', log = () => {} } = {}) {
       }
       if (msg.t === 'kick' && me.id === room.hostId) {
         const c = room.clients.get(msg.id);
-        if (c) { send(c.ws, { t: 'error', code: 'kicked', msg: 'The host removed you from the room.' }); c.ws?.close(); room.clients.delete(c.id); broadcast(room, { t: 'peer-leave', id: c.id, gone: true }); }
+        if (c) { send(c.ws, { t: 'error', code: 'kicked', msg: 'המארח הוציא אותך מהחדר.' }); c.ws?.close(); room.clients.delete(c.id); broadcast(room, { t: 'peer-leave', id: c.id, gone: true }); }
       }
     });
 

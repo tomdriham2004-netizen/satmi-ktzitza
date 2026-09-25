@@ -21,8 +21,8 @@ function gauss() { return (Math.random() + Math.random() + Math.random() - 1.5) 
 
 export class Stack extends Minigame {
   static meta = {
-    id: 'stack', name: 'Stack Attack', icon: '🪙', countdown: true,
-    howto: 'Press your action key to <b>drop</b> the sliding gold bar. Overhang gets chopped off. Tallest tower in 22 seconds wins!',
+    id: 'stack', name: 'מגדל הזהב', icon: '🪙', countdown: true,
+    howto: 'לחצו על מקש הפעולה כדי <b>להפיל</b> את מטיל הזהב שזז. מה שבולט נחתך. המגדל הכי גבוה אחרי 22 שניות מנצח!',
   };
 
   async build() {

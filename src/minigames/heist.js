@@ -40,7 +40,7 @@ export class EventFeed {
 export async function runHeist({ ui, audio, player, pot, skill = null, onDial, mode = 'play', emit = () => {}, feed = null, local = true }) {
   const spectate = mode === 'spectate';
   const host = $(`<div class="heist">
-    <div class="loot">CRACK THE VAULT · ${money(pot)}</div>
+    <div class="loot">פרוץ את הכספת · ${money(pot)}</div>
     <div class="dials">${DIALS.map((d, i) => `
       <div class="dial" data-i="${i}">
         <svg viewBox="0 0 170 170">
@@ -49,10 +49,10 @@ export async function runHeist({ ui, audio, player, pot, skill = null, onDial, m
           <path class="zone" d="" stroke="#2fe08f" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.95"/>
           <g class="needle"><line x1="85" y1="85" x2="85" y2="24" stroke="#ffd166" stroke-width="5" stroke-linecap="round"/><circle cx="85" cy="85" r="10" fill="#ffd166"/></g>
         </svg>
-        <div class="state">${i === 0 ? 'READY' : 'LOCKED'}</div>
+        <div class="state">${i === 0 ? 'מוכן' : 'נעול'}</div>
       </div>`).join('')}</div>
     <div class="glass" style="padding:10px 16px;border-radius:16px;font:800 14px var(--font)">
-      ${!spectate && skill == null && local ? `Press <span class="kbd">SPACE</span> when the needle hits <span style="color:#1fcf86">green</span>` : `${player.name} is working the dials…`}
+      ${!spectate && skill == null && local ? `לחצו <span class="kbd">רווח</span> כשהמחוג נמצא על ה<span style="color:#1fcf86">ירוק</span>` : `${player.name} מסובב את החוגות…`}
     </div></div>`);
   const ov = ui.overlay(host, { clear: true });
   audio.play('drumroll', { count: 20 });
@@ -73,7 +73,7 @@ export async function runHeist({ ui, audio, player, pot, skill = null, onDial, m
       emit({ e: 'dial', i, center, ang });
     }
     el.classList.add('active');
-    el.querySelector('.state').textContent = 'CRACKING…';
+    el.querySelector('.state').textContent = 'פורץ…';
     const a0 = center - d.zone / 2, a1 = center + d.zone / 2;
     el.querySelector('.zone').setAttribute('d', arcPath(85, 85, 70, a0, a1));
     const needle = el.querySelector('.needle');
@@ -106,14 +106,14 @@ export async function runHeist({ ui, audio, player, pot, skill = null, onDial, m
     if (!spectate) emit({ e: 'res', i, ok: result, ang });
     el.classList.remove('active');
     el.classList.add(result ? 'ok' : 'fail');
-    el.querySelector('.state').textContent = result ? 'CLICK! ✓' : 'JAMMED ✗';
+    el.querySelector('.state').textContent = result ? 'קליק! ✓' : 'נתקע ✗';
     audio.play(result ? 'unlock' : 'error');
     if (result) cracked++;
     onDial?.(i, result);
     await wait(0.55, true);
   }
   if (!spectate) emit({ e: 'end', cracked });
-  host.querySelector('.loot').textContent = cracked === 3 ? 'JACKPOT!' : cracked === 0 ? 'ALARM!!!' : `${cracked}/3 — partial haul`;
+  host.querySelector('.loot').textContent = cracked === 3 ? 'ג׳קפוט!' : cracked === 0 ? 'אזעקה!!!' : `${cracked}/3: שלל חלקי`;
   await wait(1.1, true);
   await ov.close();
   return cracked;

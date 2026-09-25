@@ -12,7 +12,7 @@ import { wait } from "../core/tween.js";
 import { audio } from "../audio/audio.js";
 
 export const $ = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
-export const money = (n) => `$${Math.round(n).toLocaleString('en-US')}`;
+export const money = (n) => `₪${Math.round(n).toLocaleString('en-US')}`;
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -54,12 +54,12 @@ export class UI {
         <div class="pcard glass" data-pid="${p.id}" style="--pc:${ch.color}">
           <div class="avatar"><img src="${this.pimg(p)}" alt=""></div>
           <div class="who">
-            <div class="name">${esc(p.name)} ${p.isAI ? '<span class="tag">CPU</span>' : ''}${me === p.id ? '<span class="tag you">YOU</span>' : ''}</div>
+            <div class="name">${esc(p.name)} ${p.isAI ? '<span class="tag">מחשב</span>' : ''}${me === p.id ? '<span class="tag you">אתה</span>' : ''}</div>
             <div class="cash money">${money(p.cash)}</div>
             <div class="deeds"></div>
           </div>
-          <div class="side"><div class="badges"></div>${p.isAI || state.online ? '' : `<span class="kbd" title="Your auction key">${SEAT_KEYS[p.seat].label}</span>`}<span class="net-dot" title="Connection"></span></div>
-          <div class="stamp">BANKRUPT</div>
+          <div class="side"><div class="badges"></div>${p.isAI || state.online ? '' : `<span class="kbd" title="המקש שלך במכירה פומבית">${SEAT_KEYS[p.seat].label}</span>`}<span class="net-dot" title="חיבור"></span></div>
+          <div class="stamp">פשט רגל</div>
         </div>`);
       card.addEventListener('click', () => this.onPlayerClick?.(p.id));
       players.appendChild(card);
@@ -69,19 +69,19 @@ export class UI {
     top.innerHTML = `
       <div class="pill glass clock-pill">
         <div class="clock"><div class="dial"></div><div class="ico">☀</div></div>
-        <div class="phase-txt"><small>Round <b class="rnd">1</b></small><span class="big phase">Morning</span></div>
+        <div class="phase-txt"><small>סיבוב <b class="rnd">1</b></small><span class="big phase">בוקר</span></div>
       </div>
-      <div class="pill glass vault-pill" title="The Vault — land on THE HEIST to crack it">
+      <div class="pill glass vault-pill" title="הכספת: נחתו על השוד כדי לפרוץ אותה">
         <span style="font-size:22px">🏦</span>
-        <div class="phase-txt"><small>The Vault</small><span class="big vault">$0</span></div>
+        <div class="phase-txt"><small>הכספת</small><span class="big vault">₪0</span></div>
       </div>
       <div id="hype"></div>`;
     const menu = this.layer('menubar');
     menu.innerHTML = `
-      <button class="iconbtn" data-a="help" title="How to play">❔</button>
-      <button class="iconbtn" data-a="music" title="Music">🎵</button>
-      <button class="iconbtn" data-a="sfx" title="Sound">🔊</button>
-      <button class="iconbtn" data-a="menu" title="Menu (Esc)">☰</button>`;
+      <button class="iconbtn" data-a="help" title="איך משחקים">❔</button>
+      <button class="iconbtn" data-a="music" title="מוזיקה">🎵</button>
+      <button class="iconbtn" data-a="sfx" title="צלילים">🔊</button>
+      <button class="iconbtn" data-a="menu" title="תפריט (Esc)">☰</button>`;
     menu.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => this.onMenu?.(b.dataset.a, b)));
     bindSounds(menu);
     this.layer('feed');
@@ -120,9 +120,9 @@ export class UI {
       deeds.innerHTML = owned.map((i) => `<i class="${state.tiles[i].mortgaged ? 'm' : ''}" style="background:${TILES[i].type === 'property' ? DISTRICTS[TILES[i].district].color : '#8c93a8'}"></i>`).join('');
       // badges
       const b = [];
-      if (p.inJail) b.push('<span title="In the Slammer">🔒</span>');
-      if (p.cards.jailFree) b.push(`<span title="Lawyer on Speed Dial">⚖️</span>`);
-      if (state.bounty?.playerId === p.id) b.push('<span title="Wanted!">🎯</span>');
+      if (p.inJail) b.push('<span title="בכלא">🔒</span>');
+      if (p.cards.jailFree) b.push(`<span title="עורך דין בחיוג מהיר">⚖️</span>`);
+      if (state.bounty?.playerId === p.id) b.push('<span title="מבוקש!">🎯</span>');
       card.querySelector('.badges').innerHTML = b.join('');
       // cash
       const shown = this.displayCash.get(p.id) ?? p.cash;
@@ -194,7 +194,7 @@ export class UI {
     const box = document.getElementById('hype');
     if (!box) return;
     box.innerHTML = Object.entries(hype).map(([d, h]) => `
-      <div class="hype-chip" style="background:${DISTRICTS[d].color}"><i>${h.mult > 1 ? '🔥' : '📉'}</i>${DISTRICTS[d].name} ×${h.mult} <span style="opacity:.8">· ${h.rounds}r</span></div>`).join('');
+      <div class="hype-chip" style="background:${DISTRICTS[d].color}"><i>${h.mult > 1 ? '🔥' : '📉'}</i>${DISTRICTS[d].name} ×${h.mult} <span style="opacity:.8">· ${h.rounds} סיב׳</span></div>`).join('');
   }
 
   // ─────────────────────────────────────────── feed / toast / banner
@@ -246,7 +246,7 @@ export class UI {
     const d = this.layer('dock');
     const ch = rosterById(p.charId);
     this.dockSession = (this.dockSession || 0) + 1;
-    d.innerHTML = `<div class="thinking" style="--pc:${ch.color}"><img src="${this.pimg(p)}" style="background:${ch.color}"> ${esc(p.name)} is thinking <span class="dots"><i></i><i></i><i></i></span></div>`;
+    d.innerHTML = `<div class="thinking" style="--pc:${ch.color}"><img src="${this.pimg(p)}" style="background:${ch.color}"> ${esc(p.name)} חושב <span class="dots"><i></i><i></i><i></i></span></div>`;
     d.className = 'glass';
   }
 
@@ -298,33 +298,33 @@ export class UI {
     const ts = state.tiles[idx];
     const d = t.district ? DISTRICTS[t.district] : null;
     const color = d ? d.color : t.type === 'transit' ? '#6f7890' : '#3fa2b8';
-    const shift = d ? (d.shift === 'day' ? '☀ DAY BUSINESS' : '☾ NIGHT SPOT') : t.type === 'transit' ? '🚦 TRANSIT' : '⚡ UTILITY';
+    const shift = d ? (d.shift === 'day' ? '☀ עסק יום' : '☾ עסק לילה') : t.type === 'transit' ? '🚦 תחבורה' : '⚡ תשתית';
     let table = '';
     if (t.type === 'property') {
       table = `<table class="rent-table">${t.rent.map((r, i) => `
         <tr class="${ts.owner !== null && ts.level === i ? 'cur' : ''}"><td><span class="lvl">${[0, 1, 2, 3, 4, 5].map((k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</span>${LEVEL_NAMES[i]}</td><td>${money(r)}</td></tr>`).join('')}</table>
-        <div class="meta"><span>🔨 Upgrade ${money(d.buildCost)}</span><span>Full district ×${CONFIG.setRentMultiplier}</span></div>`;
+        <div class="meta"><span>🔨 שדרוג ${money(d.buildCost)}</span><span>שכונה מלאה ×${CONFIG.setRentMultiplier}</span></div>`;
     } else if (t.type === 'transit') {
-      table = `<table class="rent-table">${[1, 2, 3, 4].map((n) => `<tr><td>Own ${n} line${n > 1 ? 's' : ''}</td><td>${money(25 * 2 ** (n - 1))}</td></tr>`).join('')}</table>`;
+      table = `<table class="rent-table">${[1, 2, 3, 4].map((n) => `<tr><td>${n > 1 ? `${n} קווים בבעלותך` : 'קו אחד בבעלותך'}</td><td>${money(25 * 2 ** (n - 1))}</td></tr>`).join('')}</table>`;
     } else {
-      table = `<table class="rent-table"><tr><td>Own 1 utility</td><td>4× dice</td></tr><tr><td>Own both</td><td>10× dice</td></tr></table>`;
+      table = `<table class="rent-table"><tr><td>תשתית אחת בבעלותך</td><td>×4 הקוביות</td></tr><tr><td>שתיהן בבעלותך</td><td>×10 הקוביות</td></tr></table>`;
     }
     const owner = ts.owner !== null ? state.players[ts.owner] : null;
-    const ownerRow = owner ? `<div class="owner"><img src="${this.pimg(owner)}" style="background:${owner.color}"> Owned by ${esc(owner.name)} ${ts.mortgaged ? '· <span style="color:var(--bad)">MORTGAGED</span>' : ''}</div>` : '';
+    const ownerRow = owner ? `<div class="owner"><img src="${this.pimg(owner)}" style="background:${owner.color}"> בבעלות ${esc(owner.name)} ${ts.mortgaged ? '· <span style="color:var(--bad)">ממושכן</span>' : ''}</div>` : '';
     const rentBox = rent ? `<div class="now">
-        <div style="font:800 11px var(--font);letter-spacing:.14em;opacity:.7">RENT RIGHT NOW</div>
+        <div style="font:800 11px var(--font);opacity:.7">השכירות עכשיו</div>
         ${rent.breakdown.map((b) => `<div class="row"><span>${b.label}</span><span class="${b.good === true ? 'bad' : b.good === false ? 'good' : ''}">${b.value}</span></div>`).join('')}
-        <div class="total"><span style="font:800 13px var(--font)">You owe</span><span class="money">${money(rent.amount)}</span></div></div>` : '';
+        <div class="total"><span style="font:800 13px var(--font)">אתה חייב</span><span class="money">${money(rent.amount)}</span></div></div>` : '';
     return `
       <div class="deed glass" style="--dc:${color}">
         <div class="head">
-          <div class="district"><span>${d ? d.name : t.type === 'transit' ? 'Transit line' : 'Utility'}</span><span class="shift">${shift}</span></div>
+          <div class="district"><span>${d ? d.name : t.type === 'transit' ? 'קו תחבורה' : 'תשתית'}</span><span class="shift">${shift}</span></div>
           <div class="title">${esc(t.name)}</div>
-          <div class="biz">${t.kind || t.biz ? esc(t.kind || t.biz) : t.type === 'transit' ? 'Rent doubles per line owned' : 'Rent scales with the dice'}</div>
+          <div class="biz">${t.kind || t.biz ? esc(t.kind || t.biz) : t.type === 'transit' ? 'השכירות מוכפלת על כל קו בבעלותך' : 'השכירות לפי הקוביות'}</div>
         </div>
         ${stamp ? `<div class="stamp ${stamp.good ? 'good' : ''}">${stamp.text}</div>` : ''}
         <div class="body">
-          <div class="price-row"><small>Price</small><span class="money">${money(t.price)}</span></div>
+          <div class="price-row"><small>מחיר</small><span class="money">${money(t.price)}</span></div>
           ${table}
           ${ownerRow}
           ${rentBox}
@@ -447,12 +447,12 @@ export class UI {
     const isNews = deck === 'news';
     const el = $(`<div class="cardwrap"><div class="gcard ${deck}">
       <div class="face front">
-        <div class="deck">${isNews ? '<span class="live">LIVE</span> BREAKING NEWS' : '✦ FORTUNE ✦'}</div>
+        <div class="deck">${isNews ? '<span class="live">שידור חי</span> מבזק חדשות' : '✦ מזל ✦'}</div>
         <div class="emoji">${card.icon}</div>
         <div class="ctitle">${esc(card.title)}</div>
         <div class="ctext">${esc(text)}</div>
         <div class="okrow"></div>
-        ${isNews ? `<div class="ticker"><span>BOOMTOWN NEWS NETWORK • ${esc(card.title.toUpperCase())} • ${esc(player.name.toUpperCase())} ON THE SCENE • MARKETS REACT • STAY TUNED •</span></div>` : ''}
+        ${isNews ? `<div class="ticker"><span>חדשות בומטאון • ${esc(card.title)} • ${esc(player.name)} בזירה • השווקים מגיבים • הישארו איתנו •</span></div>` : ''}
       </div>
       <div class="face back">${isNews ? '📰' : '🔮'}</div></div></div>`);
     const ov = this.overlay(el);
@@ -460,7 +460,7 @@ export class UI {
     return new Promise((resolve) => {
       const done = async () => { await ov.close(); resolve(); };
       if (waitClick) {
-        const b = $(`<button class="btn ${isNews ? 'primary' : 'purple'}">OK! <span class="kbd">SPACE</span></button>`);
+        const b = $(`<button class="btn ${isNews ? 'primary' : 'purple'}">אוקיי! <span class="kbd">רווח</span></button>`);
         el.querySelector('.okrow').appendChild(b);
         bindSounds(el);
         const onKey = (e) => { if (e.repeat || this.paused) return; if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); window.removeEventListener('keydown', onKey); done(); } };
@@ -485,35 +485,35 @@ export class UI {
     }
     const raise = mode === 'raise';
     const modal = $(`<div class="modal glass wide">
-      <h2>${raise ? 'Raise funds!' : 'Your empire'}</h2>
+      <h2>${raise ? 'צריך להשיג כסף!' : 'האימפריה שלך'}</h2>
       <p class="lead">${raise
-        ? `You owe <b>${money(owed)}</b>${reason ? ` (${esc(reason)})` : ''} but only have <b>${money(p.cash)}</b>. Sell upgrades or mortgage lots — or declare bankruptcy.`
-        : `Cash: <b>${money(p.cash)}</b> · Net worth: <b>${money(R.netWorth(state, pid))}</b>. Upgrade, sell back or mortgage your lots.`}</p>
+        ? `אתה חייב <b>${money(owed)}</b>${reason ? ` (${esc(reason)})` : ''} אבל יש לך רק <b>${money(p.cash)}</b>. מכור שדרוגים או משכן מגרשים, או הכרז על פשיטת רגל.`
+        : `כסף: <b>${money(p.cash)}</b> · שווי נקי: <b>${money(R.netWorth(state, pid))}</b>. שדרג, מכור בחזרה או משכן את המגרשים שלך.`}</p>
       ${raise ? `<div class="owe-bar"><i style="width:${Math.min(100, (p.cash / owed) * 100)}%"></i></div>` : ''}
       <div class="pf"></div>
       <div class="row" style="justify-content:flex-end;margin-top:14px">
-        ${raise ? '<button class="btn danger" data-a="bankrupt"><span class="ico">💥</span>Declare bankruptcy</button>' : '<button class="btn dark" data-a="close">Done</button>'}
+        ${raise ? '<button class="btn danger" data-a="bankrupt"><span class="ico">💥</span>הכרז על פשיטת רגל</button>' : '<button class="btn dark" data-a="close">סיום</button>'}
       </div></div>`);
     const pf = modal.querySelector('.pf');
-    if (!mine.length) pf.appendChild($('<div class="pf-empty">No properties yet. Go buy something!</div>'));
+    if (!mine.length) pf.appendChild($('<div class="pf-empty">אין לך נכסים עדיין. לך תקנה משהו!</div>'));
     for (const [key, list] of byDistrict) {
       const d = DISTRICTS[key];
-      const g = $(`<div class="pf-group"><h4><i style="background:${d ? d.color : '#8c93a8'}"></i>${d ? d.name : key === 'transit' ? 'Transit' : 'Utilities'}${d && R.ownsDistrict(state, pid, key) ? ' · <span style="color:var(--good)">FULL DISTRICT ✓</span>' : ''}</h4></div>`);
+      const g = $(`<div class="pf-group"><h4><i style="background:${d ? d.color : '#8c93a8'}"></i>${d ? d.name : key === 'transit' ? 'תחבורה' : 'תשתיות'}${d && R.ownsDistrict(state, pid, key) ? ' · <span style="color:var(--good)">שכונה מלאה ✓</span>' : ''}</h4></div>`);
       for (const i of list) {
         const t = TILES[i], ts = state.tiles[i];
         const b = R.canBuild(state, pid, i), s = R.canSell(state, pid, i), m = R.canMortgage(state, pid, i), u = R.canUnmortgage(state, pid, i);
         const row = $(`<div class="pf-row ${ts.mortgaged ? 'mort' : ''}">
-          <div class="n">${esc(t.name)}<small>${t.type === 'property' ? `${LEVEL_NAMES[ts.level]} · rent ${money(R.rentFor(state, i, 7).amount)} now` : 'Rent grows with lines owned'}${ts.mortgaged ? ' · MORTGAGED' : ''}</small></div>
+          <div class="n">${esc(t.name)}<small>${t.type === 'property' ? `${LEVEL_NAMES[ts.level]} · שכירות ${money(R.rentFor(state, i, 7).amount)} כרגע` : 'השכירות גדלה עם כל קו'}${ts.mortgaged ? ' · ממושכן' : ''}</small></div>
           <div class="acts"></div></div>`);
         const acts = row.querySelector('.acts');
         const btn = (a, label, kind, ok, title = '') => {
           const e = $(`<button class="btn sm ${kind}" data-a="${a}" data-i="${i}" ${ok ? '' : 'disabled'} title="${esc(title)}">${label}</button>`);
           acts.appendChild(e);
         };
-        if (t.type === 'property' && !raise) btn('build', `＋ Upgrade ${money(R.buildCost(i))}`, 'go', b.ok, b.reason || '');
-        if (t.type === 'property' && ts.level > 0) btn('sell', `Sell +${money(s.refund)}`, 'blue', s.ok);
-        if (!ts.mortgaged) btn('mortgage', `Mortgage +${money(Math.floor(t.price * CONFIG.mortgageRatio))}`, 'ghost', m.ok, m.reason || '');
-        else if (!raise) btn('unmortgage', `Unmortgage ${money(Math.ceil(t.price * CONFIG.unmortgageRatio))}`, 'primary', u.ok, u.reason || '');
+        if (t.type === 'property' && !raise) btn('build', `＋ שדרוג ${money(R.buildCost(i))}`, 'go', b.ok, b.reason || '');
+        if (t.type === 'property' && ts.level > 0) btn('sell', `מכור +${money(s.refund)}`, 'blue', s.ok);
+        if (!ts.mortgaged) btn('mortgage', `משכן +${money(Math.floor(t.price * CONFIG.mortgageRatio))}`, 'ghost', m.ok, m.reason || '');
+        else if (!raise) btn('unmortgage', `פדה ${money(Math.ceil(t.price * CONFIG.unmortgageRatio))}`, 'primary', u.ok, u.reason || '');
         g.appendChild(row);
       }
       pf.appendChild(g);
@@ -540,10 +540,10 @@ export class UI {
     if (!others.length) return Promise.resolve(null);
     let partner = others[0];
     const sel = { give: new Set(), get: new Set(), giveCash: 0, getCash: 0 };
-    const modal = $(`<div class="modal glass wide"><h2>Make a deal 🤝</h2><p class="lead">Pick what changes hands. Properties keep their upgrades and mortgages.</p>
+    const modal = $(`<div class="modal glass wide"><h2>בוא נעשה עסקה 🤝</h2><p class="lead">בחר מה עובר ידיים. הנכסים שומרים על השדרוגים והמשכנתאות שלהם.</p>
       <div class="trade-partners"></div><div class="trade-cols"></div>
       <div class="trade-summary"><div class="lead" style="margin:0" id="tsum"></div>
-      <div class="row"><button class="btn ghost" data-a="cancel">Cancel</button><button class="btn go" data-a="propose"><span class="ico">📨</span>Propose deal</button></div></div></div>`);
+      <div class="row"><button class="btn ghost" data-a="cancel">ביטול</button><button class="btn go" data-a="propose"><span class="ico">📨</span>הצע עסקה</button></div></div></div>`);
     const ov = this.overlay(modal);
     const chip = (i, on) => `<button class="chip ${on ? 'on' : ''} ${state.tiles[i].mortgaged ? 'mort' : ''}" data-i="${i}"><i style="background:${TILES[i].district ? DISTRICTS[TILES[i].district].color : '#8c93a8'}"></i>${esc(TILES[i].name)}</button>`;
     const render = () => {
@@ -552,12 +552,12 @@ export class UI {
       const cols = modal.querySelector('.trade-cols');
       const mine = R.ownedBy(state, pid), theirs = R.ownedBy(state, partner.id);
       cols.innerHTML = `
-        <div class="trade-col"><h4><img src="${this.pimg(me)}" style="background:${me.color}">You give</h4>
-          <div class="chips" data-side="give">${mine.map((i) => chip(i, sel.give.has(i))).join('') || '<span class="lead">No properties</span>'}</div>
-          <div class="cash-in">Cash <input type="range" min="0" max="${me.cash}" step="10" value="${sel.giveCash}" data-c="give"><span class="money">${money(sel.giveCash)}</span></div></div>
-        <div class="trade-col"><h4><img src="${this.pimg(partner)}" style="background:${partner.color}">You get from ${esc(partner.name)}</h4>
-          <div class="chips" data-side="get">${theirs.map((i) => chip(i, sel.get.has(i))).join('') || '<span class="lead">No properties</span>'}</div>
-          <div class="cash-in">Cash <input type="range" min="0" max="${partner.cash}" step="10" value="${sel.getCash}" data-c="get"><span class="money">${money(sel.getCash)}</span></div></div>`;
+        <div class="trade-col"><h4><img src="${this.pimg(me)}" style="background:${me.color}">אתה נותן</h4>
+          <div class="chips" data-side="give">${mine.map((i) => chip(i, sel.give.has(i))).join('') || '<span class="lead">אין נכסים</span>'}</div>
+          <div class="cash-in">כסף <input type="range" min="0" max="${me.cash}" step="10" value="${sel.giveCash}" data-c="give"><span class="money">${money(sel.giveCash)}</span></div></div>
+        <div class="trade-col"><h4><img src="${this.pimg(partner)}" style="background:${partner.color}">אתה מקבל מ${esc(partner.name)}</h4>
+          <div class="chips" data-side="get">${theirs.map((i) => chip(i, sel.get.has(i))).join('') || '<span class="lead">אין נכסים</span>'}</div>
+          <div class="cash-in">כסף <input type="range" min="0" max="${partner.cash}" step="10" value="${sel.getCash}" data-c="get"><span class="money">${money(sel.getCash)}</span></div></div>`;
       cols.querySelectorAll('input[type=range]').forEach((inp) => inp.addEventListener('input', () => {
         sel[inp.dataset.c + 'Cash'] = +inp.value;
         inp.nextElementSibling.textContent = money(+inp.value);
@@ -568,7 +568,7 @@ export class UI {
     const summary = () => {
       const g = [...sel.give].map((i) => TILES[i].name).concat(sel.giveCash ? [money(sel.giveCash)] : []);
       const r = [...sel.get].map((i) => TILES[i].name).concat(sel.getCash ? [money(sel.getCash)] : []);
-      modal.querySelector('#tsum').innerHTML = `You give <b>${g.join(', ') || 'nothing'}</b> · you get <b>${r.join(', ') || 'nothing'}</b>`;
+      modal.querySelector('#tsum').innerHTML = `אתה נותן <b>${g.join(', ') || 'כלום'}</b> · אתה מקבל <b>${r.join(', ') || 'כלום'}</b>`;
       modal.querySelector('[data-a=propose]').disabled = !g.length && !r.length;
     };
     render();
@@ -598,21 +598,21 @@ export class UI {
 
   tradeOfferHTML(offer, state) {
     const a = state.players[offer.from], b = state.players[offer.to];
-    const list = (x) => [...x.tiles.map((i) => `<div>▪ ${esc(TILES[i].name)}</div>`), x.cash ? `<div>▪ ${money(x.cash)} cash</div>` : ''].join('') || '<div style="color:var(--ink-3)">nothing</div>';
+    const list = (x) => [...x.tiles.map((i) => `<div>▪ ${esc(TILES[i].name)}</div>`), x.cash ? `<div>▪ ${money(x.cash)} מזומן</div>` : ''].join('') || '<div style="color:var(--ink-3)">כלום</div>';
     return `<div class="trade-offer">
-      <div class="side"><h5>${esc(a.name)} gives</h5>${list(offer.give)}</div>
+      <div class="side"><h5>${esc(a.name)} נותן</h5>${list(offer.give)}</div>
       <div class="arrow">⇄</div>
-      <div class="side"><h5>${esc(b.name)} gives</h5>${list(offer.get)}</div></div>`;
+      <div class="side"><h5>${esc(b.name)} נותן</h5>${list(offer.get)}</div></div>`;
   }
 
   tradeResponse(offer, state, { auto = null } = {}) {
     const a = state.players[offer.from], b = state.players[offer.to];
     const modal = $(`<div class="modal glass">
-      <div class="choice-head"><img src="${this.pimg(a)}" style="background:${a.color}"><div><h2>Deal offer!</h2>
-      <p class="lead" style="margin:0">${esc(a.name)} → ${esc(b.name)}${auto ? '' : ` · <b>${esc(b.name)}</b>, it's your call`}</p></div></div>
+      <div class="choice-head"><img src="${this.pimg(a)}" style="background:${a.color}"><div><h2>הצעת עסקה!</h2>
+      <p class="lead" style="margin:0">${esc(a.name)} ← ${esc(b.name)}${auto ? '' : ` · <b>${esc(b.name)}</b>, ההחלטה שלך`}</p></div></div>
       ${this.tradeOfferHTML(offer, state)}
       <div class="row" style="justify-content:flex-end" id="tr-actions">
-        <button class="btn danger" data-a="no">Decline</button><button class="btn go" data-a="yes">Accept deal</button></div></div>`);
+        <button class="btn danger" data-a="no">דחה</button><button class="btn go" data-a="yes">קבל את העסקה</button></div></div>`);
     const ov = this.overlay(modal);
     audio.play('open');
     return new Promise((resolve) => {
@@ -641,7 +641,7 @@ export class UI {
   targetPick({ player, candidates, prompt, auto = null }) {
     return this.choice({
       title: prompt, player, auto: auto?.then ? { promise: auto } : auto != null ? { id: auto, delay: 1 } : null,
-      options: candidates.map((c) => ({ id: c.id, label: esc(c.name), sub: `${money(c.cash)} cash`, icon: `<img src="${this.pimg(c)}" style="width:30px;height:30px;border-radius:9px;background:${c.color}">`, kind: 'ghost' })),
+      options: candidates.map((c) => ({ id: c.id, label: esc(c.name), sub: `${money(c.cash)} מזומן`, icon: `<img src="${this.pimg(c)}" style="width:30px;height:30px;border-radius:9px;background:${c.color}">`, kind: 'ghost' })),
     });
   }
 
@@ -652,11 +652,11 @@ export class UI {
     host.className = '';
     host.innerHTML = `
       <div class="vs-half l" style="--pc:${cha.color}">
-        <div class="rl">${reason === 'rent' ? 'CHALLENGER' : 'LEFT SIDE'}</div>
+        <div class="rl">${reason === 'rent' ? 'המתמודד' : 'צד שמאל'}</div>
         <img src="${this.pimg(a)}" alt=""><div class="nm">${esc(a.name)}</div>
         <div class="keys">${keysA}</div></div>
       <div class="vs-half r" style="--pc:${chb.color}">
-        <div class="rl">${reason === 'rent' ? 'LANDLORD' : 'RIGHT SIDE'}</div>
+        <div class="rl">${reason === 'rent' ? 'בעל הבית' : 'צד ימין'}</div>
         <img src="${this.pimg(b)}" alt=""><div class="nm">${esc(b.name)}</div>
         <div class="keys">${keysB}</div></div>
       <div class="vs-mid">VS</div>
@@ -681,34 +681,34 @@ export class UI {
 
   // ─────────────────────────────────────────── title / setup
   title({ hasSave, onPlay, onContinue, onHelp, onOnline, onMap }) {
-    const letters = 'BOOMTOWN'.split('');
+    const letters = 'בומטאון'.split('');
     const cols = ['#ff5d73', '#ffb31f', '#2fcf85', '#2fa8ff', '#8a63ff', '#ff6fae', '#ff9a3c', '#5763e0'];
     const el = $(`<div id="title">
       <div class="logo-wrap">
         <div class="logo">${letters.map((c, i) => `<span style="--c:${cols[i]};--rot:${(i % 2 ? 1 : -1) * 2}deg;animation-delay:${i * 0.07}s, ${1 + i * 0.18}s">${c}</span>`).join('')}</div>
-        <div class="tagline">Deeds <i>✦</i> Duels <i>✦</i> Total chaos</div>
+        <div class="tagline">נכסים <i>✦</i> דו-קרבות <i>✦</i> כאוס מוחלט</div>
         <div class="feature-row">
-          <span>⚔️ Double-or-nothing rent duels</span><span>🌗 Day &amp; night economy</span><span>🎯 Bounties</span>
-          <span>🏢 Hostile takeovers</span><span>🏦 Vault heists</span><span>🔨 Auction rush</span><span>📰 Breaking news</span>
+          <span>⚔️ דו-קרבות שכירות: כפול או כלום</span><span>🌗 כלכלת יום ולילה</span><span>🎯 פרסים על הראש</span>
+          <span>🏢 השתלטויות עוינות</span><span>🏦 שוד כספות</span><span>🔨 מכירות פומביות בזק</span><span>📰 מבזקי חדשות</span>
         </div>
       </div>
       <div class="setup glass">
-        <h3>New game <button class="btn sm ghost" data-a="help">❔ How to play</button></h3>
-        <div class="opt-label">Map</div>
+        <h3>משחק חדש <button class="btn sm ghost" data-a="help">❔ איך משחקים</button></h3>
+        <div class="opt-label">מפה</div>
         <div class="maps">${MAP_LIST.map((m) => `<button class="map-card ${m.id === 'boomtown' ? 'on' : ''}" data-map="${m.id}" title="${esc(m.tagline)}"><span class="flag">${m.flag}</span><b>${esc(m.name)}</b></button>`).join('')}</div>
         <div class="slots"></div>
         <div class="opts">
-          <div class="opt"><label>Game length</label><div class="seg" data-o="roundLimit"><button data-v="15">15 rounds</button><button data-v="25" class="on">25 rounds</button><button data-v="0">Endless</button></div></div>
-          <div class="opt"><label>Starting cash</label><div class="seg" data-o="startingCash"><button data-v="1000">$1000</button><button data-v="1500" class="on">$1500</button><button data-v="2000">$2000</button></div></div>
-          <div class="opt"><label>CPU vs CPU duels</label><div class="seg" data-o="cpuDuels"><button data-v="quick" class="on">Quick</button><button data-v="watch">Watch them</button></div></div>
-          <div class="opt"><label>Game speed</label><div class="seg" data-o="speed"><button data-v="1" class="on">1×</button><button data-v="1.5">1.5×</button><button data-v="2">2×</button></div></div>
-          <div class="opt" title="Classic rule: nobody can build houses until round 2"><label>Building in round 1</label><div class="seg" data-o="noBuildFirstRound"><button data-v="0" class="on">Allowed</button><button data-v="1">Classic: wait</button></div></div>
+          <div class="opt"><label>אורך המשחק</label><div class="seg" data-o="roundLimit"><button data-v="15">15 סיבובים</button><button data-v="25" class="on">25 סיבובים</button><button data-v="0">בלי הגבלה</button></div></div>
+          <div class="opt"><label>כסף התחלתי</label><div class="seg" data-o="startingCash"><button data-v="1000">₪1000</button><button data-v="1500" class="on">₪1500</button><button data-v="2000">₪2000</button></div></div>
+          <div class="opt"><label>דו-קרבות בין מחשבים</label><div class="seg" data-o="cpuDuels"><button data-v="quick" class="on">מהיר</button><button data-v="watch">לצפות בהם</button></div></div>
+          <div class="opt"><label>מהירות המשחק</label><div class="seg" data-o="speed"><button data-v="1" class="on">1×</button><button data-v="1.5">1.5×</button><button data-v="2">2×</button></div></div>
+          <div class="opt" title="חוק קלאסי: אף אחד לא בונה עד סיבוב 2"><label>בנייה בסיבוב 1</label><div class="seg" data-o="noBuildFirstRound"><button data-v="0" class="on">מותר</button><button data-v="1">קלאסי: לחכות</button></div></div>
         </div>
         <div class="go-row">
-          ${hasSave ? '<button class="btn blue lg" data-a="continue"><span class="ico">↺</span>Continue</button>' : ''}
-          <button class="btn primary lg" data-a="play"><span class="ico">🎲</span>Play!</button>
+          ${hasSave ? '<button class="btn blue lg" data-a="continue"><span class="ico">↺</span>המשך משחק</button>' : ''}
+          <button class="btn primary lg" data-a="play"><span class="ico">🎲</span>שחק!</button>
         </div>
-        <button class="btn purple" data-a="online" style="width:100%;margin-top:10px"><span class="ico">🌐</span><span class="lbl">Play online with friends<span class="sub">Create a room and share the link</span></span></button>
+        <button class="btn purple" data-a="online" style="width:100%;margin-top:10px"><span class="ico">🌐</span><span class="lbl">שחק אונליין עם חברים<span class="sub">פתח חדר ושתף את הקישור</span></span></button>
       </div></div>`);
     this.root.appendChild(el);
     const slots = [
@@ -732,13 +732,13 @@ export class UI {
         const ch = rosterById(s.charId);
         const row = $(`<div class="slot" style="--pc:${ch.color}">
           <div class="arrows"><button data-d="-1">▲</button><button data-d="1">▼</button></div>
-          <div class="face" title="Change character"><img src="${this.portrait(s.charId)}" alt=""></div>
+          <div class="face" title="החלף דמות"><img src="${this.portrait(s.charId)}" alt=""></div>
           <div><input value="${esc(s.name || ch.name)}" maxlength="14" spellcheck="false"><div class="bio">${esc(ch.bio)}</div></div>
           <div class="kind">
-            <div class="seg"><button data-k="human" class="${s.isAI ? '' : 'on'}">Human</button><button data-k="cpu" class="${s.isAI ? 'on' : ''}">CPU</button></div>
-            ${s.isAI ? `<div class="seg"><button data-l="easy" class="${s.aiLevel === 'easy' ? 'on' : ''}">Easy</button><button data-l="normal" class="${s.aiLevel === 'normal' ? 'on' : ''}">Norm</button><button data-l="hard" class="${s.aiLevel === 'hard' ? 'on' : ''}">Hard</button></div>` : `<div class="bio" style="text-align:center">Auction key <span class="kbd">${SEAT_KEYS[k].label}</span></div>`}
+            <div class="seg"><button data-k="human" class="${s.isAI ? '' : 'on'}">שחקן</button><button data-k="cpu" class="${s.isAI ? 'on' : ''}">מחשב</button></div>
+            ${s.isAI ? `<div class="seg"><button data-l="easy" class="${s.aiLevel === 'easy' ? 'on' : ''}">קל</button><button data-l="normal" class="${s.aiLevel === 'normal' ? 'on' : ''}">רגיל</button><button data-l="hard" class="${s.aiLevel === 'hard' ? 'on' : ''}">קשה</button></div>` : `<div class="bio" style="text-align:center">מקש מכירה <span class="kbd">${SEAT_KEYS[k].label}</span></div>`}
           </div>
-          ${slots.length > 2 ? '<button class="rm" title="Remove">✕</button>' : ''}</div>`);
+          ${slots.length > 2 ? '<button class="rm" title="הסר">✕</button>' : ''}</div>`);
         const cycle = (d) => {
           const taken = new Set(slots.map((x) => x.charId));
           let idx = ROSTER.findIndex((c) => c.id === s.charId);
@@ -761,7 +761,7 @@ export class UI {
         box.appendChild(row);
       });
       if (slots.length < 4) {
-        const add = $('<button class="add-slot">＋ Add player</button>');
+        const add = $('<button class="add-slot">＋ הוסף שחקן</button>');
         add.addEventListener('click', () => {
           const taken = new Set(slots.map((x) => x.charId));
           const c = ROSTER.find((r) => !taken.has(r.id));
@@ -802,20 +802,20 @@ export class UI {
 
   howTo() {
     const cards = [
-      ['🏗️', 'Build an empire', 'Buy lots, then upgrade them from Kiosk all the way to a Landmark. Own a whole district to unlock Towers & Landmarks and 1.5× rent.'],
-      ['⚔️', 'Double-or-nothing duels', 'Land on a rival business and you can pay rent… or DUEL the owner in a 1v1 minigame. Win: pay nothing. Lose: pay DOUBLE.'],
-      ['🌗', 'Day & night economy', 'Every round the clock ticks: Morning → Noon → Dusk → Night. ☀ Day businesses charge 1.5× in daylight, ☾ night spots after dark. Off-hours: 0.75×.'],
-      ['🎯', 'Bounty on the leader', 'Run away with the game and a bounty lands on your head — growing every round. Beat the leader in ANY duel to collect it from the bank.'],
-      ['🏢', 'Hostile takeover', 'Landed on a rival lot? Pay 2× its value to snatch it — upgrades and all. Owning the full district protects you.'],
-      ['🏦', 'The Vault heist', 'Taxes, fines and bail pile up in the glass Vault. Land on THE HEIST and crack 3 dials: all three = jackpot. Zero = busted.'],
-      ['🔨', 'Auction rush', 'Pass on a lot and everyone scrambles: HOLD your key (Q · P · Z · M) as the price climbs. Last one holding wins it.'],
-      ['📰', 'Breaking news', 'Flash mobs, earthquakes, blackouts, Robin Hood, viral trends… News changes the whole board. Fortune changes yours.'],
-      ['🚓', 'The Slammer', 'Pay bail, roll doubles — or APPEAL: duel the richest player for your freedom.'],
+      ['🏗️', 'בנה אימפריה', 'קנה מגרשים ושדרג אותם מקיוסק ועד ציון דרך. שכונה שלמה בבעלותך פותחת מגדלים וציוני דרך, ושכירות ×1.5.'],
+      ['⚔️', 'דו-קרב: כפול או כלום', 'נחתת על עסק של יריב? אפשר לשלם שכירות… או להזמין את הבעלים לדו-קרב במיני-משחק אחד על אחד. ניצחון: לא משלמים כלום. הפסד: משלמים כפול.'],
+      ['🌗', 'כלכלת יום ולילה', 'בכל סיבוב השעון מתקדם: בוקר ← צהריים ← שקיעה ← לילה. ☀ עסקי יום גובים ×1.5 באור יום, ☾ עסקי לילה אחרי החשכה. מחוץ לשעות הפעילות: ×0.75.'],
+      ['🎯', 'פרס על ראש המוביל', 'ברחת לכולם? על הראש שלך יושב פרס שגדל בכל סיבוב. מי שמנצח את המוביל בדו-קרב כלשהו גובה אותו מהבנק.'],
+      ['🏢', 'השתלטות עוינת', 'נחתת על מגרש של יריב? שלם פי 2 מהשווי שלו וחטוף אותו, כולל השדרוגים. שכונה מלאה בבעלותך מגינה עליך.'],
+      ['🏦', 'שוד הכספת', 'מסים, קנסות וערבויות נערמים בכספת הזכוכית. נחת על השוד ופרוץ 3 חוגות: שלוש = ג׳קפוט. אפס = נתפסת.'],
+      ['🔨', 'מכירה פומבית בזק', 'ויתרת על מגרש? כולם מסתערים: החזיקו את המקש (Q · P · Z · M) בזמן שהמחיר עולה. מי שמחזיק אחרון זוכה.'],
+      ['📰', 'מבזקי חדשות', 'פלאש מוב, רעידות אדמה, הפסקות חשמל, רובין הוד, טרנדים ויראליים… החדשות משנות את כל הלוח. המזל משנה רק את שלך.'],
+      ['🚓', 'הכלא', 'שלם ערבות, הטל דאבל, או ערער: דו-קרב מול השחקן הכי עשיר על החופש שלך.'],
     ];
-    const modal = $(`<div class="modal glass howto"><h2>How to play BOOMTOWN</h2>
-      <p class="lead">Classic property-tycoon rules at heart — plus a pile of chaos. Controls: <span class="kbd">SPACE</span> roll/confirm · drag to orbit · scroll to zoom · duels: left player <span class="kbd">WASD</span>+<span class="kbd">F</span>, right player <span class="kbd">ARROWS</span>+<span class="kbd">ENTER</span>. Solo vs CPU: <span class="kbd">SPACE</span> works too.</p>
+    const modal = $(`<div class="modal glass howto"><h2>איך משחקים בומטאון</h2>
+      <p class="lead">בבסיס זה משחק נדל״ן קלאסי, עם ערימה של כאוס מעל. שליטה: <span class="kbd">רווח</span> הטלה/אישור · גרירה לסיבוב המצלמה · גלגלת לזום · בדו-קרבות: השחקן בצד שמאל <span class="kbd">WASD</span>+<span class="kbd">F</span>, השחקן בצד ימין <span class="kbd">חצים</span>+<span class="kbd">ENTER</span>. לבד מול המחשב: גם <span class="kbd">רווח</span> עובד.</p>
       <div class="howto-grid">${cards.map(([e, h, p]) => `<div class="howto-card"><div class="e">${e}</div><h4>${h}</h4><p>${p}</p></div>`).join('')}</div>
-      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn primary">Let's go!</button></div></div>`);
+      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn primary">יאללה!</button></div></div>`);
     const ov = this.overlay(modal);
     audio.play('open');
     return new Promise((resolve) => {
@@ -825,14 +825,14 @@ export class UI {
   }
 
   pauseMenu({ settings, onSetting, online = false }) {
-    const modal = $(`<div class="modal glass"><h2>Paused</h2>
-      <div class="setting">Music <div class="seg" data-s="music"><button data-v="1" class="${settings.music ? 'on' : ''}">On</button><button data-v="0" class="${settings.music ? '' : 'on'}">Off</button></div></div>
-      <div class="setting">Sound effects <div class="seg" data-s="sfx"><button data-v="1" class="${settings.sfx ? 'on' : ''}">On</button><button data-v="0" class="${settings.sfx ? '' : 'on'}">Off</button></div></div>
-      <div class="setting">Graphics <div class="seg" data-s="quality"><button data-v="high" class="${settings.quality === 'high' ? 'on' : ''}">High</button><button data-v="low" class="${settings.quality === 'low' ? 'on' : ''}">Performance</button></div></div>
-      <div class="setting">Game speed <div class="seg" data-s="speed">${[1, 1.5, 2].map((v) => `<button data-v="${v}" class="${settings.speed === v ? 'on' : ''}">${v}×</button>`).join('')}</div></div>
+    const modal = $(`<div class="modal glass"><h2>המשחק בהפסקה</h2>
+      <div class="setting">מוזיקה <div class="seg" data-s="music"><button data-v="1" class="${settings.music ? 'on' : ''}">פועל</button><button data-v="0" class="${settings.music ? '' : 'on'}">כבוי</button></div></div>
+      <div class="setting">אפקטים קוליים <div class="seg" data-s="sfx"><button data-v="1" class="${settings.sfx ? 'on' : ''}">פועל</button><button data-v="0" class="${settings.sfx ? '' : 'on'}">כבוי</button></div></div>
+      <div class="setting">גרפיקה <div class="seg" data-s="quality"><button data-v="high" class="${settings.quality === 'high' ? 'on' : ''}">גבוהה</button><button data-v="low" class="${settings.quality === 'low' ? 'on' : ''}">ביצועים</button></div></div>
+      <div class="setting">מהירות המשחק <div class="seg" data-s="speed">${[1, 1.5, 2].map((v) => `<button data-v="${v}" class="${settings.speed === v ? 'on' : ''}">${v}×</button>`).join('')}</div></div>
       <div class="row" style="margin-top:18px;justify-content:space-between">
-        <button class="btn danger" data-a="quit">${online ? 'Leave the room' : 'Save &amp; quit to title'}</button>
-        <div class="row"><button class="btn ghost" data-a="help">How to play</button><button class="btn go" data-a="resume">Resume</button></div></div></div>`);
+        <button class="btn danger" data-a="quit">${online ? 'עזוב את החדר' : 'שמור וצא לתפריט'}</button>
+        <div class="row"><button class="btn ghost" data-a="help">איך משחקים</button><button class="btn go" data-a="resume">המשך</button></div></div></div>`);
     const ov = this.overlay(modal);
     audio.play('open');
     return new Promise((resolve) => {
@@ -860,20 +860,20 @@ export class UI {
       const top = state.players.slice().sort((a, b) => b.stats[key] - a.stats[key])[0];
       if (top && top.stats[key] > 0) awards.push(`<div class="award"><div class="e">${e}</div>${t}<small>${esc(top.name)} · ${fmt(top.stats[key])}</small></div>`);
     };
-    best('duelsWon', '⚔️', 'Duel Champion', (v) => `${v} wins`);
-    best('rentEarned', '🏠', 'Landlord Supreme', (v) => `${money(v)} rent`);
-    best('bestHeist', '🦹', 'Master Thief', (v) => `${money(v)} heist`);
-    best('takeovers', '🏢', 'Corporate Raider', (v) => `${v} takeovers`);
-    best('bounties', '🎯', 'Bounty Hunter', (v) => `${v} claimed`);
+    best('duelsWon', '⚔️', 'אלוף הדו-קרבות', (v) => `${v} ניצחונות`);
+    best('rentEarned', '🏠', 'בעל הבית העליון', (v) => `${money(v)} שכירות`);
+    best('bestHeist', '🦹', 'גנב אמן', (v) => `${money(v)} בשוד`);
+    best('takeovers', '🏢', 'כריש תאגידים', (v) => `${v} השתלטויות`);
+    best('bounties', '🎯', 'צייד ראשים', (v) => `${v} פרסים`);
     const modal = $(`<div class="modal glass gameover" style="--pc:${ch.color}">
       <div class="crown">👑</div>
-      <div class="winner"><img src="${this.pimg(winner)}" alt=""><h1>${esc(winner.name)}</h1><div class="sub">TYCOON OF BOOMTOWN</div></div>
+      <div class="winner"><img src="${this.pimg(winner)}" alt=""><h1>${esc(winner.name)}</h1><div class="sub">הטייקון של בומטאון</div></div>
       <div class="standings">${standings.map((s, k) => {
         const p = state.players[s.id];
-        return `<div class="standing" style="--pc:${p.color}"><div class="rk">#${k + 1}</div><img src="${this.pimg(p)}"><div><b>${esc(p.name)}</b>${p.bankrupt ? ' <span style="color:var(--bad);font-weight:800">· BANKRUPT</span>' : ''}<div class="bar" style="width:${Math.max(3, (s.worth / max) * 100)}%;animation-delay:${0.3 + k * 0.12}s"></div></div><div class="nw">${money(s.worth)}</div></div>`;
+        return `<div class="standing" style="--pc:${p.color}"><div class="rk">#${k + 1}</div><img src="${this.pimg(p)}"><div><b>${esc(p.name)}</b>${p.bankrupt ? ' <span style="color:var(--bad);font-weight:800">· פשט רגל</span>' : ''}<div class="bar" style="width:${Math.max(3, (s.worth / max) * 100)}%;animation-delay:${0.3 + k * 0.12}s"></div></div><div class="nw">${money(s.worth)}</div></div>`;
       }).join('')}</div>
       ${awards.length ? `<div class="awards">${awards.join('')}</div>` : ''}
-      <div class="row" style="justify-content:center"><button class="btn ghost lg" data-a="menu">Main menu</button><button class="btn primary lg" data-a="again">🎲 Play again</button></div></div>`);
+      <div class="row" style="justify-content:center"><button class="btn ghost lg" data-a="menu">תפריט ראשי</button><button class="btn primary lg" data-a="again">🎲 עוד משחק</button></div></div>`);
     const ov = this.overlay(modal);
     return new Promise((resolve) => {
       modal.addEventListener('click', async (e) => {
@@ -922,10 +922,10 @@ class AuctionUI {
     const t = TILES[idx];
     const col = t.district ? DISTRICTS[t.district].color : '#8c93a8';
     const el = $(`<div class="auction glass">
-      <div class="lot"><i style="background:${col}"></i>AUCTION RUSH · ${esc(t.name)} · list price ${money(t.price)}</div>
-      <div class="price money">$0</div>
-      <div class="status">Get ready — HOLD your key to stay in!</div>
-      <div class="bidders">${bidders.map((b) => `<div class="bidder" data-pid="${b.p.id}" style="--pc:${b.p.color}"><img src="${this.ui.pimg(b.p)}"><div class="nm">${esc(b.p.name)}</div><div class="st">${b.key ? `Hold <span class="kbd">${b.key}</span>` : 'CPU'}</div></div>`).join('')}</div></div>`);
+      <div class="lot"><i style="background:${col}"></i>מכירה פומבית · ${esc(t.name)} · מחיר מחירון ${money(t.price)}</div>
+      <div class="price money">₪0</div>
+      <div class="status">היכונו! החזיקו את המקש כדי להישאר במכירה!</div>
+      <div class="bidders">${bidders.map((b) => `<div class="bidder" data-pid="${b.p.id}" style="--pc:${b.p.color}"><img src="${this.ui.pimg(b.p)}"><div class="nm">${esc(b.p.name)}</div><div class="st">${b.key ? `החזק <span class="kbd">${b.key}</span>` : 'מחשב'}</div></div>`).join('')}</div></div>`);
     this.ov = this.ui.overlay(el, { clear: false });
     this.el = el;
     return el;
