@@ -43,9 +43,9 @@ async function boot() {
       document.fonts.load('800 40px "Bricolage Grotesque Variable"'),
       document.fonts.load('700 40px "Bricolage Grotesque Variable"'),
       // Hebrew faces: board signs are drawn once onto canvases, so they must be ready first
-      document.fonts.load('400 40px "Secular One"', 'בומטאון'),
-      document.fonts.load('800 40px "Rubik Variable"', 'בומטאון'),
-      document.fonts.load('700 40px "Rubik Variable"', 'בומטאון'),
+      document.fonts.load('400 40px "Secular One"', 'סתמי קציצה'),
+      document.fonts.load('800 40px "Rubik Variable"', 'סתמי קציצה'),
+      document.fonts.load('700 40px "Rubik Variable"', 'סתמי קציצה'),
     ]),
     new Promise((r) => setTimeout(r, 2500)),
   ]);
@@ -295,5 +295,5 @@ async function boot() {
 boot().catch((err) => {
   console.error(err);
   const b = document.getElementById('boot');
-  if (b) b.innerHTML = `<div class="boot-logo" style="font-size:28px;text-align:center">לא הצלחנו להפעיל את בומטאון<br><small style="font-size:16px">${err.message}</small></div>`;
+  if (b) b.innerHTML = `<div class="boot-logo" style="font-size:28px;text-align:center">לא הצלחנו להפעיל את סתמי קציצה<br><small style="font-size:16px">${err.message}</small></div>`;
 });

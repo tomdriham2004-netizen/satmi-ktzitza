@@ -453,7 +453,7 @@ export class UI {
         <div class="ctitle">${esc(card.title)}</div>
         <div class="ctext">${esc(text)}</div>
         <div class="okrow"></div>
-        ${isNews ? `<div class="ticker"><span>חדשות בומטאון • ${esc(card.title)} • ${esc(player.name)} בזירה • השווקים מגיבים • הישארו איתנו •</span></div>` : ''}
+        ${isNews ? `<div class="ticker"><span>חדשות סתמי קציצה • ${esc(card.title)} • ${esc(player.name)} בזירה • השווקים מגיבים • הישארו איתנו •</span></div>` : ''}
       </div>
       <div class="face back">${isNews ? '📰' : '🔮'}</div></div></div>`);
     const ov = this.overlay(el);
@@ -682,11 +682,11 @@ export class UI {
 
   // ─────────────────────────────────────────── title / setup
   title({ hasSave, onPlay, onContinue, onHelp, onOnline, onMap }) {
-    const letters = 'בומטאון'.split('');
+    const letters = [...'סתמי קציצה'];
     const cols = ['#ff5d73', '#ffb31f', '#2fcf85', '#2fa8ff', '#8a63ff', '#ff6fae', '#ff9a3c', '#5763e0'];
     const el = $(`<div id="title">
       <div class="logo-wrap">
-        <div class="logo">${letters.map((c, i) => `<span style="--c:${cols[i]};--rot:${(i % 2 ? 1 : -1) * 2}deg;animation-delay:${i * 0.07}s, ${1 + i * 0.18}s">${c}</span>`).join('')}</div>
+        <div class="logo">${letters.map((c, i) => c === ' ' ? '<span class="gap"></span>' : `<span style="--c:${cols[i % cols.length]};--rot:${(i % 2 ? 1 : -1) * 2}deg;animation-delay:${i * 0.07}s, ${1 + i * 0.18}s">${c}</span>`).join('')}</div>
         <div class="tagline">נכסים <i>✦</i> דו-קרבות <i>✦</i> כאוס מוחלט</div>
         <div class="feature-row">
           <span>⚔️ דו-קרבות שכירות: כפול או כלום</span><span>🌗 כלכלת יום ולילה</span><span>🎯 פרסים על הראש</span>
@@ -813,7 +813,7 @@ export class UI {
       ['📰', 'מבזקי חדשות', 'פלאש מוב, רעידות אדמה, הפסקות חשמל, רובין הוד, טרנדים ויראליים… החדשות משנות את כל הלוח. המזל משנה רק את שלך.'],
       ['🚓', 'הכלא', 'משלמים ערבות, מנסים להוציא דאבל, או מגישים ערעור: דו-קרב מול השחקן העשיר ביותר על החופש שלך.'],
     ];
-    const modal = $(`<div class="modal glass howto"><h2>איך משחקים בומטאון</h2>
+    const modal = $(`<div class="modal glass howto"><h2>איך משחקים סתמי קציצה</h2>
       <p class="lead">בבסיס זה משחק נדל״ן קלאסי, רק עם הרבה יותר כאוס. ${IS_TOUCH ? 'שליטה: לוחצים על הכפתורים · גוררים אצבע כדי לסובב את הלוח · צובטים בשתי אצבעות לזום · נוגעים במגרש כדי לראות את הכרטיס שלו · בדו-קרבות מופיעים על המסך כפתור פעולה (ובמשחק הדחיפות גם ג׳ויסטיק). שני שחקנים על אותו טלפון? כל אחד מקבל כפתור בצד שלו.</p>' : `שליטה: <span class="kbd">רווח</span> הטלה/אישור · גרירה לסיבוב המצלמה · גלגלת לזום · בדו-קרבות: השחקן בצד שמאל <span class="kbd">WASD</span>+<span class="kbd">F</span>, השחקן בצד ימין <span class="kbd">חצים</span>+<span class="kbd">ENTER</span>. לבד מול המחשב: גם <span class="kbd">רווח</span> עובד.</p>`}
       <div class="howto-grid">${cards.map(([e, h, p]) => `<div class="howto-card"><div class="e">${e}</div><h4>${h}</h4><p>${p}</p></div>`).join('')}</div>
       <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn primary">יאללה!</button></div></div>`);
@@ -868,7 +868,7 @@ export class UI {
     best('bounties', '🎯', 'צייד ראשים', (v) => `${v} פרסים`);
     const modal = $(`<div class="modal glass gameover" style="--pc:${ch.color}">
       <div class="crown">👑</div>
-      <div class="winner"><img src="${this.pimg(winner)}" alt=""><h1>${esc(winner.name)}</h1><div class="sub">הטייקון של בומטאון</div></div>
+      <div class="winner"><img src="${this.pimg(winner)}" alt=""><h1>${esc(winner.name)}</h1><div class="sub">הטייקון של סתמי קציצה</div></div>
       <div class="standings">${standings.map((s, k) => {
         const p = state.players[s.id];
         return `<div class="standing" style="--pc:${p.color}"><div class="rk">#${k + 1}</div><img src="${this.pimg(p)}"><div><b>${esc(p.name)}</b>${p.bankrupt ? ' <span style="color:var(--bad);font-weight:800">· פשט רגל</span>' : ''}<div class="bar" style="width:${Math.max(3, (s.worth / max) * 100)}%;animation-delay:${0.3 + k * 0.12}s"></div></div><div class="nw">${money(s.worth)}</div></div>`;

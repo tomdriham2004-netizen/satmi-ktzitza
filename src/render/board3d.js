@@ -583,7 +583,7 @@ export class Board3D {
   buildDiceBowl() {
     const R = 3.05;
     const g = new THREE.Group();
-    const felt = this.feltTex('בומטאון', 'נכסים  ·  דו-קרבות  ·  כאוס מוחלט');
+    const felt = this.feltTex('סתמי קציצה', 'נכסים  ·  דו-קרבות  ·  כאוס מוחלט');
     this.feltMat = new THREE.MeshStandardMaterial({ map: felt, roughness: 0.95 });
     const floor = new THREE.Mesh(new THREE.CircleGeometry(R, 64), this.feltMat);
     floor.rotation.x = -Math.PI / 2;
@@ -995,8 +995,8 @@ export class Board3D {
     }
     this.feltMat.map?.dispose();
     this.feltMat.map = map.id === 'boomtown'
-      ? this.feltTex('בומטאון', 'נכסים  ·  דו-קרבות  ·  כאוס מוחלט')
-      : this.feltTex(map.center, 'בומטאון  ·  ישראל');
+      ? this.feltTex('סתמי קציצה', 'נכסים  ·  דו-קרבות  ·  כאוס מוחלט')
+      : this.feltTex(map.center, 'סתמי קציצה  ·  ישראל');
     this.feltMat.needsUpdate = true;
     this.ferris.visible = map.landmark === 'ferris';
     for (const g of Object.values(this.landmarks)) g.visible = false;

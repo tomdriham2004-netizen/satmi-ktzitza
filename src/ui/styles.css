@@ -499,7 +499,8 @@ button { font-family: inherit; }
 #title { position: absolute; inset: 0; z-index: 50; display: grid; grid-template-columns: 1fr minmax(460px, 560px); align-items: center; padding: 4vh 5vw; gap: 3vw; background: linear-gradient(90deg, rgba(14, 10, 40, 0.05) 30%, rgba(14, 10, 40, 0.35)); }
 #title.out { animation: fadeOut 0.6s ease forwards; }
 .logo-wrap { align-self: center; }
-.logo { display: flex; font: 400 clamp(64px, 10vw, 150px)/0.9 var(--display); letter-spacing: 0.005em; }
+.logo { display: flex; flex-wrap: wrap; justify-content: center; row-gap: 0.06em; font: 400 clamp(64px, 10vw, 150px)/0.9 var(--display); letter-spacing: 0.005em; }
+.logo .gap { flex-basis: 100%; height: 0; }
 .logo span { display: inline-block; color: var(--c); -webkit-text-stroke: 12px #fff; paint-order: stroke fill; text-shadow: 0 10px 0 #fff, 0 12px 0 rgba(30, 20, 60, 0.25), 0 26px 30px rgba(30, 20, 60, 0.35); animation: letterIn 0.8s var(--ease-pop) both, letterBob 3.2s ease-in-out infinite; }
 @keyframes letterIn { from { transform: translateY(-120px) rotate(-20deg) scale(0.4); opacity: 0; } }
 @keyframes letterBob { 50% { transform: translateY(-6px) rotate(var(--rot, 2deg)); } }

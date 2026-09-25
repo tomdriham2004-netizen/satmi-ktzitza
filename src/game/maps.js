@@ -11,7 +11,7 @@ const T = (name, kind, sig) => ({ name, kind, sig });
 
 export const MAPS = {
   boomtown: {
-    id: 'boomtown', name: 'בומטאון', flag: '🎲', center: 'בומטאון', tagline: 'העיירה המקורית על האי',
+    id: 'boomtown', name: 'סתמי קציצה', flag: '🎲', center: 'סתמי קציצה', tagline: 'העיירה המקורית על האי',
     landmark: 'ferris', leaves: ['#4fb561', '#5cc36b', '#3fa35a', '#72cf6a'],
   },
 
