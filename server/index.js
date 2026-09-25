@@ -11,6 +11,7 @@ const PORT = Number(process.env.PORT) || 80;
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
   '.woff2': 'font/woff2', '.woff': 'font/woff', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon',
+  '.webmanifest': 'application/manifest+json',
 };
 
 const server = http.createServer((req, res) => {
@@ -22,7 +23,7 @@ const server = http.createServer((req, res) => {
   const ext = path.extname(file);
   res.writeHead(200, {
     'Content-Type': TYPES[ext] || 'application/octet-stream',
-    'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable',
+    'Cache-Control': ext === '.html' || ext === '.webmanifest' ? 'no-cache' : 'public, max-age=31536000, immutable',
   });
   fs.createReadStream(file).pipe(res);
 });

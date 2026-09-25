@@ -5,6 +5,7 @@ import "@fontsource-variable/rubik";
 import "@fontsource/secular-one";
 import "./ui/styles.css";
 import "./ui/mobile.css";
+import "./ui/appmode.js";
 import * as THREE from "three";
 import { Stage } from "./render/stage.js";
 import { Environment } from "./render/environment.js";

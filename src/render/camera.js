@@ -3,6 +3,7 @@
 // shake, FOV punches and user orbit/zoom all layer on top.
 import * as THREE from "three";
 import { tween, Ease, damp, clamp } from "../core/tween.js";
+import { IS_PHONE } from "./stage.js";
 
 const TAU = Math.PI * 2;
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
@@ -140,7 +141,9 @@ export class CameraDirector {
     const yaw = this.cur.yaw + this.user.yaw + Math.sin(this.drift * 0.13) * 0.012;
     const pitch = clamp(this.cur.pitch + this.user.pitch + Math.sin(this.drift * 0.21) * 0.006, 0.08, 1.45);
     const fit = Math.min(1.8, Math.max(1, 1.45 / this.camera.aspect));
-    const dist = this.cur.dist * this.user.zoom * fit;
+    // phones held sideways: frame a little tighter so the town reads bigger
+    const near = IS_PHONE && this.camera.aspect > 1.3 ? 0.86 : 1;
+    const dist = this.cur.dist * this.user.zoom * fit * near;
     const t = this.cur.target;
     const cp = Math.cos(pitch);
     this.camera.position.set(t.x + Math.sin(yaw) * cp * dist, t.y + Math.sin(pitch) * dist, t.z + Math.cos(yaw) * cp * dist);

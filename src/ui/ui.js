@@ -79,6 +79,7 @@ export class UI {
       <div id="hype"></div>`;
     const menu = this.layer('menubar');
     menu.innerHTML = `
+      <button class="iconbtn fs-btn" data-a="fs" data-fs title="מסך מלא">⛶</button>
       <button class="iconbtn" data-a="help" title="איך משחקים">❔</button>
       <button class="iconbtn" data-a="music" title="מוזיקה">🎵</button>
       <button class="iconbtn" data-a="sfx" title="צלילים">🔊</button>
@@ -688,6 +689,7 @@ export class UI {
       <div class="logo-wrap">
         <div class="logo">${letters.map((c, i) => c === ' ' ? '<span class="gap"></span>' : `<span style="--c:${cols[i % cols.length]};--rot:${(i % 2 ? 1 : -1) * 2}deg;animation-delay:${i * 0.07}s, ${1 + i * 0.18}s">${c}</span>`).join('')}</div>
         <div class="tagline">נכסים <i>✦</i> דו-קרבות <i>✦</i> כאוס מוחלט</div>
+        <button class="btn fs-btn fs-title" data-fs>⛶ מסך מלא</button>
         <div class="feature-row">
           <span>⚔️ דו-קרבות שכירות: כפול או כלום</span><span>🌗 כלכלת יום ולילה</span><span>🎯 פרסים על הראש</span>
           <span>🏢 השתלטויות עוינות</span><span>🏦 שוד כספות</span><span>🔨 מכירות פומביות בזק</span><span>📰 מבזקי חדשות</span>

@@ -2,6 +2,7 @@
 // boats and a hot-air balloon — plus the day/night cycle driving all of it.
 import * as THREE from "three";
 import { HALF } from "./layout.js";
+import { IS_PHONE } from "./stage.js";
 import { mat, box, cyl, sphere, cone, group, at, nightMaterials, stripeMat, dynamic, bakeChildren } from "./kit.js";
 import { lerp, damp, clamp } from "../core/tween.js";
 
@@ -44,7 +45,8 @@ export class Environment {
     const sun = new THREE.DirectionalLight('#fff', 3);
     sun.castShadow = true;
     const hi = this.stage.quality === 'high';
-    sun.shadow.mapSize.set(hi ? 4096 : 2048, hi ? 4096 : 2048);
+    const ms = IS_PHONE ? (hi ? 2048 : 1024) : (hi ? 4096 : 2048);
+    sun.shadow.mapSize.set(ms, ms);
     const S = 19;
     Object.assign(sun.shadow.camera, { left: -S, right: S, top: S, bottom: -S, near: 20, far: 200 });
     sun.shadow.camera.updateProjectionMatrix();

@@ -77,12 +77,18 @@ const GradeShader = {
   `,
 };
 
+// Phones: fewer pixels, no MSAA and a smaller shadow map by default, plus a
+// dynamic resolution that steps down while the frame rate struggles.
+export const IS_PHONE = !!(window.matchMedia?.('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 820);
+const maxRatio = (q) => IS_PHONE ? (q === 'high' ? 1.75 : 1.25) : (q === 'high' ? 2 : 1.25);
+
 export class Stage {
   constructor(container, { quality = 'high' } = {}) {
     this.container = container;
     this.quality = quality;
     const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance', stencil: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === 'high' ? 2 : 1.25));
+    this.scale = 1;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxRatio(quality)));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -106,13 +112,14 @@ export class Stage {
     const size = renderer.getDrawingBufferSize(new THREE.Vector2());
     const rt = new THREE.WebGLRenderTarget(size.x, size.y, {
       type: THREE.HalfFloatType,
-      samples: quality === 'high' ? 4 : 0,
+      samples: quality === 'high' && !IS_PHONE ? 4 : 0,
     });
     this.composer = new EffectComposer(renderer, rt);
     this.renderPass = new RenderPass(this.scene, this.camera);
     this.composer.addPass(this.renderPass);
     this.bloom = new UnrealBloomPass(new THREE.Vector2(size.x / 2, size.y / 2), 0.3, 0.42, 1.05);
     this.composer.addPass(this.bloom);
+    if (IS_PHONE && quality !== 'high') this.bloom.enabled = false;
     this.composer.addPass(new OutputPass());
     this.grade = new ShaderPass(GradeShader);
     this.composer.addPass(this.grade);
@@ -128,8 +135,27 @@ export class Stage {
 
   setQuality(q) {
     this.quality = q;
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, q === 'high' ? 2 : 1.25));
+    this.scale = 1;
+    if (IS_PHONE) this.bloom.enabled = q === 'high';
+    this.applyRatio();
     this.resize();
+  }
+
+  applyRatio() {
+    const r = Math.max(1, Math.min(window.devicePixelRatio, maxRatio(this.quality)) * this.scale);
+    if (Math.abs(this.renderer.getPixelRatio() - r) < 0.01) return;
+    this.renderer.setPixelRatio(r);
+    this.resize();
+  }
+
+  /** Phones only: trade resolution for a steady frame rate (checked every 2s). */
+  adapt(realDt) {
+    if (!IS_PHONE) return;
+    this.adaptT = (this.adaptT || 0) + realDt;
+    if (this.adaptT < 2) return;
+    this.adaptT = 0;
+    if (this.fps < 42 && this.scale > 0.6) { this.scale = Math.max(0.6, this.scale - 0.12); this.applyRatio(); }
+    else if (this.fps > 57 && this.scale < 1) { this.scale = Math.min(1, this.scale + 0.06); this.applyRatio(); }
   }
 
   resize() {
@@ -173,6 +199,7 @@ export class Stage {
       this.last = now;
       this.fps = this.fps * 0.95 + (1 / Math.max(realDt, 1e-3)) * 0.05;
       this.frame(realDt, true);
+      if (!document.hidden) this.adapt(realDt);
     };
     requestAnimationFrame(loop);
   }

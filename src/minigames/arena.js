@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { Effects } from "../render/effects.js";
 import { Pawn } from "../render/characters.js";
 import { damp } from "../core/tween.js";
+import { IS_PHONE } from "../render/stage.js";
 
 export class Arena {
   constructor(stage, { top = '#6a5cff', bottom = '#ffb3c7', fog = null, ground = null, ambience = 'motes' } = {}) {
@@ -42,7 +43,7 @@ export class Arena {
     const key = new THREE.DirectionalLight('#fff4e0', 2.4);
     key.position.set(6, 12, 8);
     key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
+    key.shadow.mapSize.set(IS_PHONE ? 1024 : 2048, IS_PHONE ? 1024 : 2048);
     Object.assign(key.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, near: 1, far: 50 });
     key.shadow.camera.updateProjectionMatrix();
     key.shadow.bias = -0.0005;
