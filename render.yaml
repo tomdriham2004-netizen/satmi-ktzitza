@@ -1,0 +1,13 @@
+# Render blueprint: one free web service that serves the built game and hosts
+# the online rooms (WebSocket /ws) on the same port.
+services:
+  - type: web
+    name: satmi-ktzitza
+    runtime: node
+    plan: free
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
