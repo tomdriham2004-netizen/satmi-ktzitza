@@ -112,7 +112,7 @@ export class Board3D {
         ctx.fillStyle = '#fff';
         ctx.fillText(pt, W / 2, H - 18);
       } else {
-        const sub = { news: 'שלוף קלף', fortune: 'שלוף קלף', tax: `שלם ₪${t.amount}` }[t.type] || '';
+        const sub = { news: 'קח קלף', fortune: 'קח קלף', tax: `שלם ₪${t.amount}` }[t.type] || '';
         ctx.font = `700 22px ${FONT_UI}`;
         ctx.fillStyle = '#4b4462';
         ctx.fillText(sub, W / 2, H - 22);
@@ -996,7 +996,7 @@ export class Board3D {
     this.feltMat.map?.dispose();
     this.feltMat.map = map.id === 'boomtown'
       ? this.feltTex('בומטאון', 'נכסים  ·  דו-קרבות  ·  כאוס מוחלט')
-      : this.feltTex(map.center, 'עיר  של  בומטאון');
+      : this.feltTex(map.center, 'בומטאון  ·  ישראל');
     this.feltMat.needsUpdate = true;
     this.ferris.visible = map.landmark === 'ferris';
     for (const g of Object.values(this.landmarks)) g.visible = false;
@@ -1079,6 +1079,107 @@ export class Board3D {
       });
       g.add(at(cyl(0.02, 0.03, 0.8, mat('#c9ccd4', { metal: 0.8 }), { seg: 6 }), 0, y + 0.4, 0));
       g.add(at(sphere(0.06, beacon), 0, y + 0.82, 0));
+    } else if (kind === 'azrieli') {
+      // Tel Aviv: the three Azrieli towers — round, triangular, square
+      const glass = facadeMat('#cfd9e4', 'glass', '#5b7a9c');
+      const roof = mat('#e9eef4', { metal: 0.4, rough: 0.35 });
+      const round = cyl(0.42, 0.42, 5.2, glass, { seg: 28 });
+      g.add(at(round, 0.55, 0.3 + 2.6, 0.35));
+      g.add(at(cyl(0.44, 0.44, 0.12, roof, { seg: 28 }), 0.55, 5.56, 0.35));
+      g.add(at(cyl(0.02, 0.03, 0.9, mat('#c9ccd4', { metal: 0.8 }), { seg: 6 }), 0.55, 6.05, 0.35));
+      g.add(at(sphere(0.06, beacon), 0.55, 6.52, 0.35));
+      const tri = cyl(0.62, 0.62, 4.8, glass, { seg: 3 });
+      g.add(at(tri, -0.55, 0.3 + 2.4, 0.3, Math.PI / 6));
+      g.add(at(cyl(0.64, 0.64, 0.12, roof, { seg: 3 }), -0.55, 5.16, 0.3, Math.PI / 6));
+      g.add(at(facadeBox(0.8, 4.3, 0.8, glass, { floors: 14, cell: 0.3 }), 0, 0.3 + 2.15, -0.6));
+      g.add(at(box(0.84, 0.12, 0.84, roof), 0, 4.66, -0.6));
+      g.add(at(box(1.9, 0.5, 1.7, facadeMat('#d8d2c4', 'wide', '#4a5a78')), 0, 0.55, 0.02));
+    } else if (kind === 'davidtower') {
+      // Jerusalem: stone city wall with a gate, a crenellated tower and the Tower of David
+      const stone = facadeMat('#e6d3a8', 'arch', '#6b5a3e');
+      const plain = mat('#e2cf9f', { rough: 0.9 });
+      const dark = mat('#4a3b28');
+      const crenels = (w, d, y, cx = 0, cz = 0) => {
+        for (let k = -w / 2 + 0.1; k <= w / 2 - 0.05; k += 0.22) {
+          g.add(at(box(0.12, 0.16, 0.12, plain), cx + k, y, cz + d / 2 - 0.06));
+          g.add(at(box(0.12, 0.16, 0.12, plain), cx + k, y, cz - d / 2 + 0.06));
+        }
+      };
+      g.add(at(facadeBox(2.8, 1.3, 0.55, stone, { floors: 3, cell: 0.4 }), 0, 0.3 + 0.65, 0.5));
+      crenels(2.8, 0.55, 1.68, 0, 0.5);
+      g.add(at(box(0.5, 0.8, 0.1, dark), 0, 0.7, 0.8));            // the gate
+      g.add(at(cyl(0.25, 0.25, 0.1, dark, { seg: 16 }), 0, 1.1, 0.8, 0, Math.PI / 2));
+      g.add(at(facadeBox(1.0, 2.6, 1.0, stone, { floors: 7, cell: 0.36 }), -0.8, 0.3 + 1.3, -0.35));
+      crenels(1.0, 1.0, 2.98, -0.8, -0.35);
+      // the slender tower with its balcony and cap
+      g.add(at(cyl(0.26, 0.3, 3.9, plain, { seg: 12 }), 0.75, 0.3 + 1.95, -0.4));
+      g.add(at(cyl(0.4, 0.4, 0.1, plain, { seg: 12 }), 0.75, 3.2, -0.4));
+      g.add(at(cyl(0.2, 0.22, 0.9, plain, { seg: 12 }), 0.75, 4.65, -0.4));
+      g.add(at(cone(0.24, 0.55, mat('#8a9aa6', { metal: 0.4 }), { seg: 12 }), 0.75, 5.37, -0.4));
+      g.add(at(sphere(0.05, beacon), 0.75, 5.72, -0.4));
+    } else if (kind === 'bahai') {
+      // Haifa: the Baha'i terraces climbing to the golden-domed shrine
+      const lawn = mat('#5fae5a', { rough: 0.9 });
+      const edge = mat('#f4efe2');
+      for (let k = 0; k < 5; k++) {
+        const w = 2.6 - k * 0.38, h = 0.34;
+        g.add(at(box(w, h, w, lawn), 0, 0.3 + h / 2 + k * h, 0));
+        g.add(at(box(w + 0.04, 0.05, w + 0.04, edge), 0, 0.3 + (k + 1) * h, 0));
+      }
+      const base = 0.3 + 5 * 0.34;
+      g.add(at(facadeBox(0.95, 0.75, 0.95, facadeMat('#f6f1e4', 'arch', '#8a7a5a'), { floors: 2, cell: 0.3 }), 0, base + 0.375, 0));
+      g.add(at(box(1.05, 0.08, 1.05, edge), 0, base + 0.79, 0));
+      g.add(at(cyl(0.36, 0.36, 0.5, facadeMat('#f6f1e4', 'arch', '#6f8a6a'), { seg: 8 }), 0, base + 1.08, 0));
+      const gold = mat('#ffc83d', { metal: 0.85, rough: 0.25 });
+      g.add(at(sphere(0.4, gold, { thetaLen: Math.PI / 2 }), 0, base + 1.3, 0));
+      g.add(at(cyl(0.02, 0.03, 0.35, gold, { seg: 6 }), 0, base + 1.85, 0));
+    } else if (kind === 'israelflag') {
+      // Israel: a tall flagpole flying the flag
+      const flagTex = canvasTex(384, 276, (ctx, W, H) => {
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#0038b8';
+        ctx.fillRect(0, H * 0.1, W, H * 0.15);
+        ctx.fillRect(0, H * 0.75, W, H * 0.15);
+        const cx = W / 2, cy = H / 2, r = H * 0.2;
+        ctx.strokeStyle = '#0038b8'; ctx.lineWidth = H * 0.035; ctx.lineJoin = 'miter';
+        for (const rot of [-Math.PI / 2, Math.PI / 2]) {
+          ctx.beginPath();
+          for (let k = 0; k < 3; k++) {
+            const a = rot + (k * Math.PI * 2) / 3;
+            const px = cx + Math.cos(a) * r, py = cy + Math.sin(a) * r;
+            k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+          }
+          ctx.closePath(); ctx.stroke();
+        }
+      });
+      const flagM = new THREE.MeshStandardMaterial({ map: flagTex, side: THREE.DoubleSide, roughness: 0.8 });
+      const flag = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 1.5, 12, 1), flagM);
+      // a gentle frozen ripple
+      const pos = flag.geometry.attributes.position;
+      for (let v = 0; v < pos.count; v++) pos.setZ(v, Math.sin((pos.getX(v) + 1.05) * 3) * 0.08 * (pos.getX(v) + 1.05));
+      flag.geometry.computeVertexNormals();
+      flag.position.set(1.08, 5.4, 0);
+      g.add(flag);
+      g.add(at(cyl(0.06, 0.08, 6.3, mat('#d7dbe2', { metal: 0.7, rough: 0.3 }), { seg: 10 }), 0, 0.3 + 3.15, 0));
+      g.add(at(sphere(0.12, mat('#ffc83d', { metal: 0.85, rough: 0.25 })), 0, 6.5, 0));
+      g.add(at(cyl(0.7, 0.8, 0.35, mat('#e8dcc4'), { seg: 16 }), 0, 0.47, 0));
+    } else if (kind === 'observatory') {
+      // Eilat: the underwater observatory tower standing in the Red Sea
+      const sea = mat('#2fb3d6', { transparent: true, opacity: 0.8, rough: 0.2 });
+      g.add(at(cyl(1.45, 1.45, 0.08, sea, { seg: 32 }), 0, 0.34, 0));
+      g.add(at(box(0.3, 0.1, 1.4, mat('#c9a77a')), 0, 0.42, 0.75));   // the pier
+      const white = mat('#f4f6f8', { rough: 0.5 });
+      g.add(at(cyl(0.22, 0.3, 3.2, white, { seg: 16 }), 0, 0.3 + 1.6, 0));
+      g.add(at(cyl(0.62, 0.45, 0.55, facadeMat('#eef3f7', 'glass', '#2f6f9a'), { seg: 16 }), 0, 3.75, 0));
+      g.add(at(cyl(0.68, 0.68, 0.08, mat('#ff7a3c')), 0, 4.06, 0));
+      g.add(at(cone(0.35, 0.5, white, { seg: 16 }), 0, 4.35, 0));
+      g.add(at(sphere(0.06, beacon), 0, 4.66, 0));
+      g.add(at(torus(0.45, 0.05, mat('#ff7a3c'), { rs: 8, ts: 24 }), 0, 1.4, 0, 0, Math.PI / 2));
+      for (const [px, pz, s] of [[1.05, -0.95, 0.75], [-1.1, -0.8, 0.6]]) {
+        const palm = makePalm(s);
+        palm.position.set(px, 0.3, pz);
+        g.add(palm);
+      }
     }
     g.position.set(x, 0, z);
     g.rotation.y = Math.PI / 4;

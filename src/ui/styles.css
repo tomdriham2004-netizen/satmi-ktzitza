@@ -633,7 +633,7 @@ button { font-family: inherit; }
 
 /* map picker */
 .setup .opt-label { font: 800 11px var(--font); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px; }
-.maps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
+.maps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 12px; }
 .map-card { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; border-radius: 14px; border: 2px solid transparent; background: rgba(40, 30, 80, 0.06); cursor: pointer; font: 800 12px var(--font); color: var(--ink); transition: transform 0.15s var(--ease-pop), border-color 0.15s, background 0.15s; }
 .map-card .flag { font-size: 22px; line-height: 1.1; }
 .map-card:hover { transform: translateY(-2px); }

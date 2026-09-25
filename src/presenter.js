@@ -245,7 +245,7 @@ export class Presenter {
           sub = `של ${o.name}${t.type === 'property' ? ` · ${LEVEL_NAMES[ts.level]}` : ''}${ts.mortgaged ? ' · ממושכן' : ` · שכירות ${money(R.rentFor(this.state, i, 7).amount)}`}`;
         }
         if (this.tilePick?.allowed.includes(i)) sub = `לחץ לשדרוג · ${money(R.buildCost(i))}`;
-      } else sub = { go: 'מקבלים ₪200 בכל מעבר', jail: 'הכלא', heist: `פרוץ את הכספת · ${money(this.state.vault)}`, gotojail: 'ישר לכלא', news: 'קלף מבזק חדשות', fortune: 'קלף מזל', tax: `שלם ₪${t.amount} לכספת` }[t.type] || '';
+      } else sub = { go: 'בכל מעבר כאן מקבלים ₪200', jail: 'הכלא', heist: `פרוץ את הכספת · ${money(this.state.vault)}`, gotojail: 'ישר לכלא', news: 'קלף מבזק חדשות', fortune: 'קלף מזל', tax: `שלם ₪${t.amount} לכספת` }[t.type] || '';
       const el = $(`<div class="tile-tip" style="--tc:${t.district ? DISTRICTS[t.district].color : '#8c93a8'}">${t.name}<small>${sub}</small></div>`);
       tip = this.labels.add(el, tileCenter(i).setY(0.6), { offsetY: -10 });
     });
@@ -397,7 +397,7 @@ export class Presenter {
         this.labels.float(`+${money(salary)} משכורת`, gp, 'float-money up', { life: 1.8, rise: 80 });
         audio.play('cash');
         this.ui.syncPlayers(this.state);
-        this.ui.feed(`${this.name(p)} עבר ביום משכורת: <b>+${money(salary)}</b>`, '#1fcf86');
+        this.ui.feed(`${this.name(p)} קיבל משכורת: <b>+${money(salary)}</b>`, '#1fcf86');
       }
       if (!last) this.fx.dust(pawn.root.position.clone(), 3, 0.35);
     }
@@ -425,7 +425,7 @@ export class Presenter {
 
   async homeTurf(p, idx) {
     const pawn = this.pawnOf(p);
-    this.labels.float('בבית!', this.headPos(p), 'float-text', { life: 1.4 });
+    this.labels.float('אצלי בבית!', this.headPos(p), 'float-text', { life: 1.4 });
     pawn.celebrate();
     audio.play('sparkle', { vol: 0.5 });
     await wait(0.9);
@@ -513,7 +513,7 @@ export class Presenter {
       this.fx.firework(top.clone());
       this.fx.firework(top.clone().add(V(1, 0, 1)));
       this.cam.shake(0.2);
-      await this.ui.banner({ title: 'ציון דרך!', subtitle: `${TILES[idx].name} הפך לאייקון`, icon: '🏆', color: this.color(p), duration: 1.3 });
+      await this.ui.banner({ title: 'אייקון!', subtitle: `${TILES[idx].name} הוא עכשיו אייקון של העיר`, icon: '🏆', color: this.color(p), duration: 1.3 });
     } else await wait(0.35);
   }
 
@@ -533,7 +533,7 @@ export class Presenter {
     this.fx.dust(this.buildings.plotWorld(idx), 10, 0.6);
     this.labels.float(`${on ? '+' : '−'}${money(value)}`, this.buildings.topOf(idx), `float-money ${on ? 'up' : 'down'}`, { life: 1.4 });
     this.syncPlayers();
-    this.ui.feed(`${this.name(p)} ${on ? 'משכן את' : 'פדה את'} <b>${TILES[idx].name}</b>`, this.color(p));
+    this.ui.feed(`${this.name(p)} ${on ? 'לקח משכנתא על' : 'פדה את'} <b>${TILES[idx].name}</b>`, this.color(p));
     await wait(0.4);
   }
 
@@ -559,7 +559,7 @@ export class Presenter {
   }
 
   async rentDodged(p, owner, idx, amount) {
-    this.labels.float('התחמק!', this.headPos(p), 'float-money up', { life: 1.8 });
+    this.labels.float('חמק!', this.headPos(p), 'float-money up', { life: 1.8 });
     this.fx.confetti(this.headPos(p), { count: 50, colors: [this.color(p), '#fff'] });
     this.pawnOf(p).celebrate();
     this.pawnOf(owner).angry();
@@ -590,14 +590,14 @@ export class Presenter {
     const buttons = [
       { id: 'pay', label: 'שלם שכירות', sub: `ל${owner.name}`, icon: '💸', kind: 'ghost', cost: money(rent.amount), hotkey: 'KeyP' },
     ];
-    if (duel) buttons.unshift({ id: 'duel', label: 'דו-קרב על זה!', sub: `ניצחון: משלמים ₪0 · הפסד: משלמים ${money(duelLoss)}`, icon: '⚔️', kind: 'duel', hotkey: 'KeyD' });
+    if (duel) buttons.unshift({ id: 'duel', label: 'בוא לדו-קרב!', sub: `ניצחון: משלמים ₪0 · הפסד: משלמים ${money(duelLoss)}`, icon: '⚔️', kind: 'duel', hotkey: 'KeyD' });
     buttons.push({
       id: 'takeover', label: 'השתלטות עוינת', icon: '🏢', kind: 'purple',
-      sub: takeover ? `לחטוף את זה מ${owner.name}` : takeoverReason === 'השכונה מוגנת' ? '🔒 שכונה מלאה מוגנת' : takeoverReason === 'ממושכן' ? 'לא כשהנכס ממושכן' : `צריך ${money(takeoverPrice || 0)}`,
+      sub: takeover ? `לקחת את המגרש מ${owner.name}` : takeoverReason === 'השכונה מוגנת' ? '🔒 שכונה מלאה מוגנת' : takeoverReason === 'ממושכן' ? 'לא כשהנכס ממושכן' : `צריך ${money(takeoverPrice || 0)}`,
       cost: takeover ? money(takeover) : null, disabled: !takeover,
     });
     let note = '';
-    if (s.bounty?.playerId === owner.id) note = `🎯 על הראש של <b>${owner.name}</b> יש פרס של <b>${money(s.bounty.amount)}</b>. נצח אותו בדו-קרב ותיקח אותו!`;
+    if (s.bounty?.playerId === owner.id) note = `🎯 על הראש של <b>${owner.name}</b> יש פרס של <b>${money(s.bounty.amount)}</b>. נצח אותו בדו-קרב והפרס שלך!`;
     this.pawnOf(owner).lookAt(this.pawnOf(p).root.position);
     return this.ui.propCard(t.index, s, { buttons, rent, note, auto: this.autoOf(auto, 1.2) })
       .then((r) => { this.busyCard = false; this.ui.hidePropCard(); this.pawnOf(owner).lookAt(null); return r; });
@@ -606,7 +606,7 @@ export class Presenter {
   jailChoice(ctx, auto) {
     const { player: p, options: o } = ctx;
     const opts = [
-      { id: 'roll', label: 'הטל ונסה לקבל דאבל', sub: `ניסיון ${o.turn} מתוך ${o.maxTurns}`, icon: '🎲', kind: 'primary' },
+      { id: 'roll', label: 'לנסות להוציא דאבל', sub: `ניסיון ${o.turn} מתוך ${o.maxTurns}`, icon: '🎲', kind: 'primary' },
       { id: 'pay', label: 'שלם ערבות', sub: 'לכספת, ואז מטילים כרגיל', icon: '💰', kind: 'ghost', cost: money(o.bail), disabled: !o.canPay },
     ];
     if (o.card) opts.push({ id: 'card', label: 'התקשר לעורך הדין', sub: 'השתמש בקלף היציאה בחינם', icon: '⚖️', kind: 'blue' });
@@ -762,7 +762,7 @@ export class Presenter {
 
   async release(p, how) {
     const pawn = this.pawnOf(p);
-    const txt = { card: 'עורך הדין הציל את המצב! ⚖️', bail: 'הערבות שולמה.', appeal: 'הערעור התקבל!', doubles: 'דאבל: חופשי!', served: 'סיים לרצות את העונש.' }[how] || 'חופשי!';
+    const txt = { card: 'עורך הדין הציל את המצב! ⚖️', bail: 'הערבות שולמה.', appeal: 'הערעור התקבל!', doubles: 'דאבל: חופשי!', served: 'סיים לשבת את העונש.' }[how] || 'חופשי!';
     this.ui.toast(`${p.name}: ${txt}`, 'good');
     audio.play('unlock');
     await pawn.hopTo(this.restSpot(p), { height: 0.9, duration: 0.45 });
@@ -808,7 +808,7 @@ export class Presenter {
     for (let k = 0; k < 6; k++) { this.cam.shake(0.6); audio.play('impact', { vol: 0.5, delay: 0 }); await wait(0.25); }
     for (const pawn of this.pawns.values()) pawn.shocked();
     await Promise.all(hits.map((i) => this.buildings.crumble(i, this.state.tiles[i].level - 1)));
-    if (!hits.length) this.ui.toast('פיו! שום דבר לא היה מספיק גבוה כדי ליפול.', 'good');
+    if (!hits.length) this.ui.toast('פיו! אף בניין לא היה גבוה מספיק כדי ליפול.', 'good');
     await wait(0.4);
   }
 
@@ -865,9 +865,9 @@ export class Presenter {
     this.ui.setClock(this.state.round, phase);
     const info = [
       { t: 'בוקר טוב', s: '☀ עסקי היום גובים עכשיו שכירות ×1.5', i: '🌅', c: '#ff9a5a' },
-      { t: 'צהריים', s: '☀ עסקי היום עדיין גובים ×1.5', i: '☀️', c: '#2fa8ff' },
+      { t: 'צהריים טובים', s: '☀ עסקי היום עדיין גובים ×1.5', i: '☀️', c: '#2fa8ff' },
       { t: 'השמש שוקעת', s: '☾ עסקי הלילה גובים עכשיו שכירות ×1.5', i: '🌇', c: '#ff6f61' },
-      { t: 'ירד הלילה', s: '☾ עסקי הלילה ב-×1.5, הניאונים דולקים', i: '🌙', c: '#3b3fa6' },
+      { t: 'לילה טוב', s: '☾ עסקי הלילה ב-×1.5, הניאונים דולקים', i: '🌙', c: '#3b3fa6' },
     ][phase];
     if (phase === 3) {
       // nightfall fireworks over the plaza
@@ -902,7 +902,7 @@ export class Presenter {
       this.cam.unfollow();
       await this.cam.move({ target: pawn.root.position.clone().add(V(0, 1, 0)), dist: 9, pitch: 0.4, yaw: sideYaw(tileSide(p.pos)) + 0.4 }, 1.0);
       audio.play('duel', { vol: 0.5 });
-      await this.ui.banner({ title: 'מבוקש!', subtitle: `${p.name} בורח לכולם · פרס של ${money(bounty.amount)}, נצחו אותו בדו-קרב!`, icon: '🎯', color: '#a0141e', duration: 1.8 });
+      await this.ui.banner({ title: 'מבוקש!', subtitle: `${p.name} השאיר את כולם מאחור · ${money(bounty.amount)} למי שינצח אותו בדו-קרב!`, icon: '🎯', color: '#a0141e', duration: 1.8 });
     } else {
       this.ui.toast(`🎯 הפרס על ${p.name} עלה ל-${money(bounty.amount)}`);
     }
@@ -1063,7 +1063,7 @@ export class Presenter {
     await g.finish(w);
     const winner = w === 0 ? a : b;
     clock.slowmo = 0.35;
-    this.ui.duelHud.big(`${winner.name} מנצח!`, '', ctx.reason === 'rent' ? (winner === a ? 'חמק מהשכירות!' : `${a.name} משלם כפול!`) : '');
+    this.ui.duelHud.big(`${winner.name} מנצח!`, '', ctx.reason === 'rent' ? (winner === a ? 'פטור משכירות!' : `${a.name} משלם כפול!`) : '');
     audio.play('win');
     await wait(0.7, true);
     clock.slowmo = 1;

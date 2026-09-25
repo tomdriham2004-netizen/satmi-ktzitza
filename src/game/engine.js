@@ -406,7 +406,7 @@ export class GameEngine {
     }
     if (ts.owner === p.id) { await this.P.homeTurf(p, t.index); return; }
     const owner = s.players[ts.owner];
-    if (ts.mortgaged) { await this.P.toast(`${t.name} ממושכן, אין שכירות לשלם.`); return; }
+    if (ts.mortgaged) { await this.P.toast(`${t.name} ממושכן, אז אין שכירות.`); return; }
     const diceTotal = dice ? dice[0] + dice[1] : 7;
     const rent = rentFor(s, t.index, diceTotal);
     if (rent.amount <= 0) return;
@@ -458,7 +458,7 @@ export class GameEngine {
       s.tiles[idx].owner = w.id;
       await this.P.purchased(w, idx, { auction: true, price });
     } else {
-      await this.P.toast('אין הצעות. המגרש נשאר בשוק.');
+      await this.P.toast('אף אחד לא הציע. המגרש נשאר למכירה.');
     }
   }
 

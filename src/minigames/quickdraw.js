@@ -41,7 +41,7 @@ function cactus(s = 1) {
 export class QuickDraw extends Minigame {
   static meta = {
     id: 'quickdraw', name: 'שליפה מהירה', icon: '🤠', countdown: false,
-    howto: 'חכו ל<b>שלוף!</b> ואז לחצו ראשונים על מקש הפעולה. מי שיורה על הטעיה מפסיד בסיבוב. הטוב מ-3.',
+    howto: 'חכו ל<b>שלוף!</b> ואז לחצו ראשונים על מקש הפעולה. מי שיורה על הטעיה מפסיד בסיבוב. הטוב מבין 3.',
   };
 
   async build() {

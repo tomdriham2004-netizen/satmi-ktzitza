@@ -14,7 +14,7 @@ export const NEWS_CARDS = [
     prepare: (e) => {
       const owned = districtIds.filter((d) => TILES.some((t) => t.district === d && e.state.tiles[t.index].owner !== null));
       const d = e.rng.pick(owned.length ? owned : districtIds);
-      return { district: d, text: `${DISTRICTS[d].name} בטרנד! השכירות שם מוכפלת ל-${CONFIG.hypeRounds} סיבובים.` };
+      return { district: d, text: `${DISTRICTS[d].name} בטרנד! השכירות שם כפולה ב-${CONFIG.hypeRounds} הסיבובים הקרובים.` };
     },
     effect: async (e, p, ctx) => e.setHype(ctx.district, 2),
   },
@@ -22,13 +22,13 @@ export const NEWS_CARDS = [
     id: 'scandal', icon: '📉', title: 'שערורייה!',
     prepare: (e) => {
       const d = e.rng.pick(districtIds);
-      return { district: d, text: `שערורייה מזעזעת ב${DISTRICTS[d].name}. השכירות שם יורדת בחצי ל-${CONFIG.hypeRounds} סיבובים.` };
+      return { district: d, text: `שערורייה מטלטלת את ${DISTRICTS[d].name}. השכירות שם יורדת בחצי ב-${CONFIG.hypeRounds} הסיבובים הקרובים.` };
     },
     effect: async (e, p, ctx) => e.setHype(ctx.district, 0.5),
   },
   {
     id: 'flashmob', icon: '🕺', title: 'פלאש מוב!',
-    text: 'כולם עוזבים הכול ורוקדים עד המשבצת שלך. אף אחד לא יודע למה.',
+    text: 'כולם עוזבים הכול ורוקדים אליך. אף אחד לא יודע למה.',
     effect: async (e, p) => {
       const movers = alive(e.state).filter((o) => o.id !== p.id && !o.inJail);
       await e.P.flashMob(p, movers);
@@ -53,7 +53,7 @@ export const NEWS_CARDS = [
   },
   {
     id: 'robinhood', icon: '🏹', title: 'רובין הוד מכה שוב',
-    text: 'השחקן הכי עשיר נותן ₪150 לשחקן הכי עני. מאוד אצילי. מאוד בכפייה.',
+    text: 'העשיר ביותר מעביר ₪150 לעני ביותר. אצילי? מאוד. מרצון? ממש לא.',
     effect: async (e) => {
       const list = alive(e.state).slice().sort((a, b) => b.cash - a.cash);
       if (list.length < 2 || list[0] === list[list.length - 1]) return;
@@ -69,7 +69,7 @@ export const NEWS_CARDS = [
   },
   {
     id: 'crash', icon: '📊', title: 'קריסת שוק!',
-    text: 'מכירות בהלה! כל שחקן מפיל 10% מהכסף שלו לתוך הכספת.',
+    text: 'מכירות בהלה! כל שחקן מאבד 10% מהכסף שלו, והכול נופל לכספת.',
     effect: async (e) => {
       for (const o of alive(e.state)) {
         const amt = Math.round((o.cash * 0.1) / 5) * 5;
@@ -79,12 +79,12 @@ export const NEWS_CARDS = [
   },
   {
     id: 'blackout', icon: '🌑', title: 'הפסקת חשמל בכל העיר',
-    text: 'מישהו מעד על הכבל. פתאום לילה! עסקי הלילה גובים שכירות של שעות שיא.',
+    text: 'מישהו מעד על הכבל ופתאום לילה! עסקי הלילה גובים עכשיו מחיר של שעות השיא.',
     effect: async (e) => e.setTimePhase(3),
   },
   {
     id: 'sunrise', icon: '🌅', title: 'זריחה בהפתעה',
-    text: 'מדען מטורף הריץ את השמש קדימה. בוקר! עסקי היום גובים שכירות של שעות שיא.',
+    text: 'מדען מטורף הריץ את השמש קדימה. בוקר! עסקי היום גובים עכשיו מחיר של שעות השיא.',
     effect: async (e) => e.setTimePhase(0),
   },
   {
@@ -92,7 +92,7 @@ export const NEWS_CARDS = [
     prepare: (e, p) => {
       const rivals = alive(e.state).filter((o) => o.id !== p.id);
       const r = rivals.length ? e.rng.pick(rivals) : null;
-      return { rival: r?.id, text: r ? `${r.name} ואתה נתקלתם אחד בשני. סוגרים את זה בדו-קרב: המפסיד משלם למנצח ₪150.` : 'אין עם מי לריב. מביך.' };
+      return { rival: r?.id, text: r ? `נתקלת ב${r.name} באמצע הרחוב. סוגרים את זה בדו-קרב: המפסיד משלם למנצח ₪150.` : 'אין עם מי לריב. מביך.' };
     },
     effect: async (e, p, ctx) => {
       if (ctx.rival == null) return;
@@ -104,7 +104,7 @@ export const NEWS_CARDS = [
   },
   {
     id: 'celebrity', icon: '📸', title: 'סלב נראה בעיר',
-    text: 'פפראצי בכל מקום! בעל הנכסים הכי גדול גובה ₪25 מכל שחקן אחר.',
+    text: 'פפראצי בכל מקום! מי שיש לו הכי הרבה נכסים גובה ₪25 מכל שחקן אחר.',
     effect: async (e) => {
       const list = alive(e.state).slice().sort((a, b) => ownedBy(e.state, b.id).length - ownedBy(e.state, a.id).length);
       const star = list[0];
@@ -118,7 +118,7 @@ export const NEWS_CARDS = [
 export const FORTUNE_CARDS = [
   {
     id: 'payday', icon: '💰', title: 'ישר ליום המשכורת',
-    text: 'התקדם ליום משכורת וקבל את המשכורת שלך.',
+    text: 'רוץ ישר ליום המשכורת ותאסוף את המשכורת.',
     effect: async (e, p) => e.moveTo(p, 0, { resolve: true }),
   },
   {
@@ -135,27 +135,27 @@ export const FORTUNE_CARDS = [
   },
   {
     id: 'ticket', icon: '🚨', title: 'דוח מהירות',
-    text: 'נסעת 90 באזור של כלי משחק. שלם ₪75 לכספת.',
+    text: 'נסעת 90 קמ״ש בתוך השכונה. שלם ₪75 לכספת.',
     effect: async (e, p) => e.pay(p, 'vault', 75, 'דוח מהירות'),
   },
   {
     id: 'lawyer', icon: '⚖️', title: 'עורך דין בחיוג מהיר',
-    text: 'שמור את הקלף הזה. הוא מוציא אותך מהכלא בחינם.',
+    text: 'שמור את הקלף. בפעם הבאה שתיכנס לכלא, הוא יוציא אותך בחינם.',
     effect: async (e, p) => { p.cards.jailFree += 1; e.P.syncPlayers(); },
   },
   {
     id: 'busted', icon: '🚓', title: 'נתפסת!',
-    text: 'נתפסת חוצה באדום, אבל בסטייל. לך ישר לכלא.',
+    text: 'נתפסת חוצה באדום. עם סטייל, אבל עדיין באדום. ישר לכלא.',
     effect: async (e, p) => e.sendToJail(p, 'חצייה באדום'),
   },
   {
     id: 'back3', icon: '↩️', title: 'פנייה לא נכונה',
-    text: 'לקחת את הדרך הנופית. חזור 3 משבצות אחורה.',
+    text: 'הלכת בדרך הנופית. חזור 3 משבצות אחורה.',
     effect: async (e, p) => e.moveBy(p, -3, { resolve: true }),
   },
   {
     id: 'transit', icon: '🎈', title: 'תפוס טרמפ',
-    text: 'התקדם לקו התחבורה הקרוב. אם יש לו בעלים, שלם את הנסיעה.',
+    text: 'התקדם לתחנה הקרובה. אם יש לה בעלים, משלמים על הנסיעה.',
     effect: async (e, p) => {
       const next = TRANSIT_INDICES.find((i) => i > p.pos) ?? TRANSIT_INDICES[0];
       await e.moveTo(p, next, { resolve: true });
@@ -163,7 +163,7 @@ export const FORTUNE_CARDS = [
   },
   {
     id: 'swap', icon: '🔄', title: 'החלפת מקומות',
-    text: 'החלף מקום עם כל שחקן שתבחר.',
+    text: 'בחר שחקן ותחליפו מקומות.',
     effect: async (e, p) => {
       const others = alive(e.state).filter((o) => o !== p && !o.inJail);
       if (!others.length) return;
@@ -175,7 +175,7 @@ export const FORTUNE_CARDS = [
   },
   {
     id: 'renovation', icon: '🔨', title: 'שיפוץ חינם',
-    text: 'קבלן חייב לך טובה. שדרג נכס אחד בחינם (או קח ₪100).',
+    text: 'קבלן חייב לך טובה: שדרוג אחד בחינם (ואם אין מה לשדרג, ₪100).',
     effect: async (e, p) => {
       const opts = ownedBy(e.state, p.id).filter((i) => {
         const c = canBuild({ ...e.state, players: e.state.players.map((o) => (o.id === p.id ? { ...o, cash: 1e9 } : o)) }, p.id, i);
@@ -190,7 +190,7 @@ export const FORTUNE_CARDS = [
   },
   {
     id: 'heisttip', icon: '🗝️', title: 'מידע פנימי',
-    text: 'בנקאי לחוץ מגניב לך את לוח הזמנים של הכספת. התקדם אל השוד.',
+    text: 'בנקאי לחוץ הדליף לך את לוח הזמנים של הכספת. רוץ לשוד!',
     effect: async (e, p) => e.moveTo(p, HEIST_INDEX, { resolve: true }),
   },
   {
@@ -198,7 +198,7 @@ export const FORTUNE_CARDS = [
     prepare: (e, p) => {
       const rivals = alive(e.state).filter((o) => o.id !== p.id).sort((a, b) => netWorth(e.state, b.id) - netWorth(e.state, a.id));
       const r = rivals[0];
-      return { rival: r?.id, text: r ? `אתגר את ${r.name}, היריב הכי עשיר! תנצח והוא משלם לך ₪200. תפסיד ואתה משלם לו.` : 'לא נשארו יריבים.' };
+      return { rival: r?.id, text: r ? `הזמן את ${r.name}, היריב העשיר ביותר, לדו-קרב. ניצחת? הוא משלם לך ₪200. הפסדת? אתה משלם לו.` : 'לא נשארו יריבים.' };
     },
     effect: async (e, p, ctx) => {
       if (ctx.rival == null) return;
@@ -210,7 +210,7 @@ export const FORTUNE_CARDS = [
   },
   {
     id: 'pickpocket', icon: '🧤', title: 'ידיים דביקות',
-    text: 'כייס מישהו: גנוב ₪75 מכל שחקן שתבחר.',
+    text: 'בחר שחקן וגנוב לו ₪75 מהכיס.',
     effect: async (e, p) => {
       const others = alive(e.state).filter((o) => o !== p);
       if (!others.length) return;
@@ -220,7 +220,7 @@ export const FORTUNE_CARDS = [
   },
   {
     id: 'repairs', icon: '🧰', title: 'אסון אינסטלציה',
-    text: 'שלם ₪25 לכספת על כל קומה שבבעלותך.',
+    text: 'שלם ₪25 לכספת על כל קומה שיש לך.',
     effect: async (e, p) => {
       const amt = totalLevels(e.state, p.id) * 25;
       if (amt > 0) await e.pay(p, 'vault', amt, 'תיקונים');

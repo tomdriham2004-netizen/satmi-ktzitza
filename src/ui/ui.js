@@ -303,7 +303,7 @@ export class UI {
     if (t.type === 'property') {
       table = `<table class="rent-table">${t.rent.map((r, i) => `
         <tr class="${ts.owner !== null && ts.level === i ? 'cur' : ''}"><td><span class="lvl">${[0, 1, 2, 3, 4, 5].map((k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</span>${LEVEL_NAMES[i]}</td><td>${money(r)}</td></tr>`).join('')}</table>
-        <div class="meta"><span>🔨 שדרוג ${money(d.buildCost)}</span><span>שכונה מלאה ×${CONFIG.setRentMultiplier}</span></div>`;
+        <div class="meta"><span>🔨 שדרוג ${money(d.buildCost)}</span><span>כל השכונה ×${CONFIG.setRentMultiplier}</span></div>`;
     } else if (t.type === 'transit') {
       table = `<table class="rent-table">${[1, 2, 3, 4].map((n) => `<tr><td>${n > 1 ? `${n} קווים בבעלותך` : 'קו אחד בבעלותך'}</td><td>${money(25 * 2 ** (n - 1))}</td></tr>`).join('')}</table>`;
     } else {
@@ -487,8 +487,8 @@ export class UI {
     const modal = $(`<div class="modal glass wide">
       <h2>${raise ? 'צריך להשיג כסף!' : 'האימפריה שלך'}</h2>
       <p class="lead">${raise
-        ? `אתה חייב <b>${money(owed)}</b>${reason ? ` (${esc(reason)})` : ''} אבל יש לך רק <b>${money(p.cash)}</b>. מכור שדרוגים או משכן מגרשים, או הכרז על פשיטת רגל.`
-        : `כסף: <b>${money(p.cash)}</b> · שווי נקי: <b>${money(R.netWorth(state, pid))}</b>. שדרג, מכור בחזרה או משכן את המגרשים שלך.`}</p>
+        ? `אתה חייב <b>${money(owed)}</b>${reason ? ` (${esc(reason)})` : ''} אבל יש לך רק <b>${money(p.cash)}</b>. אפשר למכור שדרוגים, לקחת משכנתא על מגרשים, או להכריז על פשיטת רגל.`
+        : `כסף: <b>${money(p.cash)}</b> · שווי נקי: <b>${money(R.netWorth(state, pid))}</b>. כאן משדרגים, מוכרים שדרוגים או לוקחים משכנתא.`}</p>
       ${raise ? `<div class="owe-bar"><i style="width:${Math.min(100, (p.cash / owed) * 100)}%"></i></div>` : ''}
       <div class="pf"></div>
       <div class="row" style="justify-content:flex-end;margin-top:14px">
@@ -498,7 +498,7 @@ export class UI {
     if (!mine.length) pf.appendChild($('<div class="pf-empty">אין לך נכסים עדיין. לך תקנה משהו!</div>'));
     for (const [key, list] of byDistrict) {
       const d = DISTRICTS[key];
-      const g = $(`<div class="pf-group"><h4><i style="background:${d ? d.color : '#8c93a8'}"></i>${d ? d.name : key === 'transit' ? 'תחבורה' : 'תשתיות'}${d && R.ownsDistrict(state, pid, key) ? ' · <span style="color:var(--good)">שכונה מלאה ✓</span>' : ''}</h4></div>`);
+      const g = $(`<div class="pf-group"><h4><i style="background:${d ? d.color : '#8c93a8'}"></i>${d ? d.name : key === 'transit' ? 'תחבורה' : 'תשתיות'}${d && R.ownsDistrict(state, pid, key) ? ' · <span style="color:var(--good)">כל השכונה שלך ✓</span>' : ''}</h4></div>`);
       for (const i of list) {
         const t = TILES[i], ts = state.tiles[i];
         const b = R.canBuild(state, pid, i), s = R.canSell(state, pid, i), m = R.canMortgage(state, pid, i), u = R.canUnmortgage(state, pid, i);
@@ -512,8 +512,8 @@ export class UI {
         };
         if (t.type === 'property' && !raise) btn('build', `＋ שדרוג ${money(R.buildCost(i))}`, 'go', b.ok, b.reason || '');
         if (t.type === 'property' && ts.level > 0) btn('sell', `מכור +${money(s.refund)}`, 'blue', s.ok);
-        if (!ts.mortgaged) btn('mortgage', `משכן +${money(Math.floor(t.price * CONFIG.mortgageRatio))}`, 'ghost', m.ok, m.reason || '');
-        else if (!raise) btn('unmortgage', `פדה ${money(Math.ceil(t.price * CONFIG.unmortgageRatio))}`, 'primary', u.ok, u.reason || '');
+        if (!ts.mortgaged) btn('mortgage', `משכנתא +${money(Math.floor(t.price * CONFIG.mortgageRatio))}`, 'ghost', m.ok, m.reason || '');
+        else if (!raise) btn('unmortgage', `פדיון ${money(Math.ceil(t.price * CONFIG.unmortgageRatio))}`, 'primary', u.ok, u.reason || '');
         g.appendChild(row);
       }
       pf.appendChild(g);
@@ -700,9 +700,9 @@ export class UI {
         <div class="opts">
           <div class="opt"><label>אורך המשחק</label><div class="seg" data-o="roundLimit"><button data-v="15">15 סיבובים</button><button data-v="25" class="on">25 סיבובים</button><button data-v="0">בלי הגבלה</button></div></div>
           <div class="opt"><label>כסף התחלתי</label><div class="seg" data-o="startingCash"><button data-v="1000">₪1000</button><button data-v="1500" class="on">₪1500</button><button data-v="2000">₪2000</button></div></div>
-          <div class="opt"><label>דו-קרבות בין מחשבים</label><div class="seg" data-o="cpuDuels"><button data-v="quick" class="on">מהיר</button><button data-v="watch">לצפות בהם</button></div></div>
+          <div class="opt"><label>דו-קרבות בין מחשבים</label><div class="seg" data-o="cpuDuels"><button data-v="quick" class="on">מהיר</button><button data-v="watch">לצפות</button></div></div>
           <div class="opt"><label>מהירות המשחק</label><div class="seg" data-o="speed"><button data-v="1" class="on">1×</button><button data-v="1.5">1.5×</button><button data-v="2">2×</button></div></div>
-          <div class="opt" title="חוק קלאסי: אף אחד לא בונה עד סיבוב 2"><label>בנייה בסיבוב 1</label><div class="seg" data-o="noBuildFirstRound"><button data-v="0" class="on">מותר</button><button data-v="1">קלאסי: לחכות</button></div></div>
+          <div class="opt" title="חוק קלאסי: אף אחד לא בונה עד סיבוב 2"><label>בנייה בסיבוב 1</label><div class="seg" data-o="noBuildFirstRound"><button data-v="0" class="on">מותר</button><button data-v="1">אסור (קלאסי)</button></div></div>
         </div>
         <div class="go-row">
           ${hasSave ? '<button class="btn blue lg" data-a="continue"><span class="ico">↺</span>המשך משחק</button>' : ''}
@@ -802,18 +802,18 @@ export class UI {
 
   howTo() {
     const cards = [
-      ['🏗️', 'בנה אימפריה', 'קנה מגרשים ושדרג אותם מקיוסק ועד ציון דרך. שכונה שלמה בבעלותך פותחת מגדלים וציוני דרך, ושכירות ×1.5.'],
-      ['⚔️', 'דו-קרב: כפול או כלום', 'נחתת על עסק של יריב? אפשר לשלם שכירות… או להזמין את הבעלים לדו-קרב במיני-משחק אחד על אחד. ניצחון: לא משלמים כלום. הפסד: משלמים כפול.'],
-      ['🌗', 'כלכלת יום ולילה', 'בכל סיבוב השעון מתקדם: בוקר ← צהריים ← שקיעה ← לילה. ☀ עסקי יום גובים ×1.5 באור יום, ☾ עסקי לילה אחרי החשכה. מחוץ לשעות הפעילות: ×0.75.'],
-      ['🎯', 'פרס על ראש המוביל', 'ברחת לכולם? על הראש שלך יושב פרס שגדל בכל סיבוב. מי שמנצח את המוביל בדו-קרב כלשהו גובה אותו מהבנק.'],
-      ['🏢', 'השתלטות עוינת', 'נחתת על מגרש של יריב? שלם פי 2 מהשווי שלו וחטוף אותו, כולל השדרוגים. שכונה מלאה בבעלותך מגינה עליך.'],
-      ['🏦', 'שוד הכספת', 'מסים, קנסות וערבויות נערמים בכספת הזכוכית. נחת על השוד ופרוץ 3 חוגות: שלוש = ג׳קפוט. אפס = נתפסת.'],
-      ['🔨', 'מכירה פומבית בזק', 'ויתרת על מגרש? כולם מסתערים: החזיקו את המקש (Q · P · Z · M) בזמן שהמחיר עולה. מי שמחזיק אחרון זוכה.'],
+      ['🏗️', 'בנה אימפריה', 'קונים מגרשים ומשדרגים אותם מדוכן קטן ועד אייקון של העיר. מי שמחזיק שכונה שלמה יכול לבנות מגדלים ואייקונים, וגובה שכירות ×1.5.'],
+      ['⚔️', 'דו-קרב: כפול או כלום', 'נחתת על עסק של יריב? אפשר לשלם שכירות… או להזמין את הבעלים לדו-קרב במיני-משחק. ניצחת? לא משלמים כלום. הפסדת? משלמים כפול.'],
+      ['🌗', 'כלכלת יום ולילה', 'בכל סיבוב השעון מתקדם: בוקר ← צהריים ← שקיעה ← לילה. ☀ עסקי יום גובים ×1.5 כשיש אור, ☾ עסקי לילה אחרי החשכה. מחוץ לשעות השיא: רק ×0.75.'],
+      ['🎯', 'פרס על ראש המוביל', 'השארת את כולם מאחור? על הראש שלך יש פרס, והוא גדל בכל סיבוב. מי שמנצח את המוביל בדו-קרב כלשהו מקבל אותו מהבנק.'],
+      ['🏢', 'השתלטות עוינת', 'נחתת על מגרש של יריב? שלם פי 2 מהשווי שלו והוא שלך, כולל השדרוגים. מי שמחזיק שכונה שלמה מוגן מזה.'],
+      ['🏦', 'שוד הכספת', 'מסים, קנסות וערבויות נערמים בכספת הזכוכית. נוחתים על השוד ופורצים 3 חוגות: שלוש מתוך שלוש = ג׳קפוט. אפס = ישר לכלא.'],
+      ['🔨', 'מכירה פומבית בזק', 'ויתרת על מגרש? כולם מתחרים עליו: מחזיקים את המקש (Q · P · Z · M) בזמן שהמחיר עולה. מי שמחזיק אחרון זוכה.'],
       ['📰', 'מבזקי חדשות', 'פלאש מוב, רעידות אדמה, הפסקות חשמל, רובין הוד, טרנדים ויראליים… החדשות משנות את כל הלוח. המזל משנה רק את שלך.'],
-      ['🚓', 'הכלא', 'שלם ערבות, הטל דאבל, או ערער: דו-קרב מול השחקן הכי עשיר על החופש שלך.'],
+      ['🚓', 'הכלא', 'משלמים ערבות, מנסים להוציא דאבל, או מגישים ערעור: דו-קרב מול השחקן העשיר ביותר על החופש שלך.'],
     ];
     const modal = $(`<div class="modal glass howto"><h2>איך משחקים בומטאון</h2>
-      <p class="lead">בבסיס זה משחק נדל״ן קלאסי, עם ערימה של כאוס מעל. שליטה: <span class="kbd">רווח</span> הטלה/אישור · גרירה לסיבוב המצלמה · גלגלת לזום · בדו-קרבות: השחקן בצד שמאל <span class="kbd">WASD</span>+<span class="kbd">F</span>, השחקן בצד ימין <span class="kbd">חצים</span>+<span class="kbd">ENTER</span>. לבד מול המחשב: גם <span class="kbd">רווח</span> עובד.</p>
+      <p class="lead">בבסיס זה משחק נדל״ן קלאסי, רק עם הרבה יותר כאוס. שליטה: <span class="kbd">רווח</span> הטלה/אישור · גרירה לסיבוב המצלמה · גלגלת לזום · בדו-קרבות: השחקן בצד שמאל <span class="kbd">WASD</span>+<span class="kbd">F</span>, השחקן בצד ימין <span class="kbd">חצים</span>+<span class="kbd">ENTER</span>. לבד מול המחשב: גם <span class="kbd">רווח</span> עובד.</p>
       <div class="howto-grid">${cards.map(([e, h, p]) => `<div class="howto-card"><div class="e">${e}</div><h4>${h}</h4><p>${p}</p></div>`).join('')}</div>
       <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn primary">יאללה!</button></div></div>`);
     const ov = this.overlay(modal);
@@ -922,7 +922,7 @@ class AuctionUI {
     const t = TILES[idx];
     const col = t.district ? DISTRICTS[t.district].color : '#8c93a8';
     const el = $(`<div class="auction glass">
-      <div class="lot"><i style="background:${col}"></i>מכירה פומבית · ${esc(t.name)} · מחיר מחירון ${money(t.price)}</div>
+      <div class="lot"><i style="background:${col}"></i>מכירה פומבית · ${esc(t.name)} · מחיר רשמי ${money(t.price)}</div>
       <div class="price money">₪0</div>
       <div class="status">היכונו! החזיקו את המקש כדי להישאר במכירה!</div>
       <div class="bidders">${bidders.map((b) => `<div class="bidder" data-pid="${b.p.id}" style="--pc:${b.p.color}"><img src="${this.ui.pimg(b.p)}"><div class="nm">${esc(b.p.name)}</div><div class="st">${b.key ? `החזק <span class="kbd">${b.key}</span>` : 'מחשב'}</div></div>`).join('')}</div></div>`);

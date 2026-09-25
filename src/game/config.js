@@ -45,4 +45,4 @@ export const TIME_PHASES = [
   { id: 'night', name: 'לילה', icon: '☾', short: 'לילה' },
 ];
 
-export const LEVEL_NAMES = ['קיוסק', 'חנות', 'חנות גדולה', 'חנות דגל', 'מגדל', 'ציון דרך'];
+export const LEVEL_NAMES = ['דוכן', 'חנות', 'בניין', 'חנות דגל', 'מגדל', 'אייקון'];

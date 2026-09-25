@@ -36,15 +36,15 @@ export function rentFor(s, idx, diceTotal = 7) {
   let amount = 0;
   if (t.type === 'property') {
     amount = t.rent[ts.level];
-    breakdown.push({ label: `בסיס (${LEVEL_NAMES[ts.level]})`, value: `₪${amount}` });
+    breakdown.push({ label: `שכירות בסיס (${LEVEL_NAMES[ts.level]})`, value: `₪${amount}` });
     if (ownsDistrict(s, owner, t.district)) {
       amount *= CONFIG.setRentMultiplier;
-      breakdown.push({ label: 'שכונה מלאה', value: `×${CONFIG.setRentMultiplier}` });
+      breakdown.push({ label: 'כל השכונה שלו', value: `×${CONFIG.setRentMultiplier}` });
     }
     const pt = isPrimeTime(s, t.district);
     const tm = pt === 'prime' ? CONFIG.primeTimeMultiplier : CONFIG.offHoursMultiplier;
     amount *= tm;
-    breakdown.push({ label: pt === 'prime' ? 'שעות שיא' : 'שעות מתות', value: `×${tm}`, good: pt === 'prime' });
+    breakdown.push({ label: pt === 'prime' ? 'שעות השיא' : 'מחוץ לשעות השיא', value: `×${tm}`, good: pt === 'prime' });
     const hype = s.hype[t.district];
     if (hype) {
       amount *= hype.mult;
@@ -75,9 +75,9 @@ export function canBuild(s, pid, idx) {
   if (ts.owner !== pid) return { ok: false, reason: 'לא שלך' };
   if (s.settings?.noBuildFirstRound && s.round <= 1) return { ok: false, reason: 'אין בנייה בסיבוב 1' };
   if (ts.mortgaged) return { ok: false, reason: 'ממושכן' };
-  if (ts.level >= CONFIG.maxLevel) return { ok: false, reason: 'בנוי עד הסוף' };
+  if (ts.level >= CONFIG.maxLevel) return { ok: false, reason: 'כבר בגובה המקסימלי' };
   if (ts.level >= CONFIG.levelsWithoutSet && !ownsDistrict(s, pid, t.district))
-    return { ok: false, reason: 'צריך את כל השכונה' };
+    return { ok: false, reason: 'צריך קודם את כל השכונה' };
   const cost = buildCost(idx);
   if (s.players[pid].cash < cost) return { ok: false, reason: 'אין מספיק כסף', cost };
   return { ok: true, cost };
@@ -94,7 +94,7 @@ export function canMortgage(s, pid, idx) {
   const ts = s.tiles[idx];
   if (!ts || ts.owner !== pid) return { ok: false };
   if (ts.mortgaged) return { ok: false, reason: 'כבר ממושכן' };
-  if (ts.level > 0) return { ok: false, reason: 'קודם מוכרים את הבניינים' };
+  if (ts.level > 0) return { ok: false, reason: 'קודם צריך למכור את הבניינים' };
   return { ok: true, value: Math.floor(TILES[idx].price * CONFIG.mortgageRatio) };
 }
 

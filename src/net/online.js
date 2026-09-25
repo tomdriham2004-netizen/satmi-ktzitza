@@ -280,7 +280,7 @@ export class OnlineFlow {
       ${isHost ? `<div class="opts">
         <div class="opt"><label>אורך המשחק</label><div class="seg" data-o="roundLimit">${[[15, '15 סיבובים'], [25, '25 סיבובים'], [0, 'בלי הגבלה']].map(([v, l]) => `<button data-v="${v}" class="${L.settings.roundLimit === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>
         <div class="opt"><label>כסף התחלתי</label><div class="seg" data-o="startingCash">${[1000, 1500, 2000].map((v) => `<button data-v="${v}" class="${L.settings.startingCash === v ? 'on' : ''}">₪${v}</button>`).join('')}</div></div>
-        <div class="opt"><label>בנייה בסיבוב 1</label><div class="seg" data-o="noBuildFirstRound">${[[0, 'מותר'], [1, 'קלאסי: לחכות']].map(([v, l]) => `<button data-v="${v}" class="${(+L.settings.noBuildFirstRound || 0) === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+        <div class="opt"><label>בנייה בסיבוב 1</label><div class="seg" data-o="noBuildFirstRound">${[[0, 'מותר'], [1, 'אסור (קלאסי)']].map(([v, l]) => `<button data-v="${v}" class="${(+L.settings.noBuildFirstRound || 0) === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>
       </div>` : `<p class="lead" style="margin:6px 0 0">${L.settings.roundLimit ? `${L.settings.roundLimit} סיבובים` : 'משחק בלי הגבלה'} · ₪${L.settings.startingCash} לכל אחד${+L.settings.noBuildFirstRound ? ' · אין בנייה בסיבוב 1' : ''}</p>`}
       <div class="row" style="justify-content:space-between;margin-top:14px;align-items:center">
         <button class="btn ghost" data-a="leave">עזוב</button>
