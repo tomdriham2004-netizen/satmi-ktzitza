@@ -10,6 +10,7 @@ import { SEAT_KEYS } from "../core/input.js";
 import { MAP_LIST } from "../game/maps.js";
 import { wait } from "../core/tween.js";
 import { audio } from "../audio/audio.js";
+import { IS_TOUCH, bigHoldButton } from "./touch.js";
 
 export const $ = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 export const money = (n) => `₪${Math.round(n).toLocaleString('en-US')}`;
@@ -808,12 +809,12 @@ export class UI {
       ['🎯', 'פרס על ראש המוביל', 'השארת את כולם מאחור? על הראש שלך יש פרס, והוא גדל בכל סיבוב. מי שמנצח את המוביל בדו-קרב כלשהו מקבל אותו מהבנק.'],
       ['🏢', 'השתלטות עוינת', 'נחתת על מגרש של יריב? שלם פי 2 מהשווי שלו והוא שלך, כולל השדרוגים. מי שמחזיק שכונה שלמה מוגן מזה.'],
       ['🏦', 'שוד הכספת', 'מסים, קנסות וערבויות נערמים בכספת הזכוכית. נוחתים על השוד ופורצים 3 חוגות: שלוש מתוך שלוש = ג׳קפוט. אפס = ישר לכלא.'],
-      ['🔨', 'מכירה פומבית בזק', 'ויתרת על מגרש? כולם מתחרים עליו: מחזיקים את המקש (Q · P · Z · M) בזמן שהמחיר עולה. מי שמחזיק אחרון זוכה.'],
+      ['🔨', 'מכירה פומבית בזק', 'ויתרת על מגרש? כולם מתחרים עליו: מחזיקים את המקש (Q · P · Z · M), או בטלפון את הכפתור שעל המסך, בזמן שהמחיר עולה. מי שמחזיק אחרון זוכה.'],
       ['📰', 'מבזקי חדשות', 'פלאש מוב, רעידות אדמה, הפסקות חשמל, רובין הוד, טרנדים ויראליים… החדשות משנות את כל הלוח. המזל משנה רק את שלך.'],
       ['🚓', 'הכלא', 'משלמים ערבות, מנסים להוציא דאבל, או מגישים ערעור: דו-קרב מול השחקן העשיר ביותר על החופש שלך.'],
     ];
     const modal = $(`<div class="modal glass howto"><h2>איך משחקים בומטאון</h2>
-      <p class="lead">בבסיס זה משחק נדל״ן קלאסי, רק עם הרבה יותר כאוס. שליטה: <span class="kbd">רווח</span> הטלה/אישור · גרירה לסיבוב המצלמה · גלגלת לזום · בדו-קרבות: השחקן בצד שמאל <span class="kbd">WASD</span>+<span class="kbd">F</span>, השחקן בצד ימין <span class="kbd">חצים</span>+<span class="kbd">ENTER</span>. לבד מול המחשב: גם <span class="kbd">רווח</span> עובד.</p>
+      <p class="lead">בבסיס זה משחק נדל״ן קלאסי, רק עם הרבה יותר כאוס. ${IS_TOUCH ? 'שליטה: לוחצים על הכפתורים · גוררים אצבע כדי לסובב את הלוח · צובטים בשתי אצבעות לזום · נוגעים במגרש כדי לראות את הכרטיס שלו · בדו-קרבות מופיעים על המסך כפתור פעולה (ובמשחק הדחיפות גם ג׳ויסטיק). שני שחקנים על אותו טלפון? כל אחד מקבל כפתור בצד שלו.</p>' : `שליטה: <span class="kbd">רווח</span> הטלה/אישור · גרירה לסיבוב המצלמה · גלגלת לזום · בדו-קרבות: השחקן בצד שמאל <span class="kbd">WASD</span>+<span class="kbd">F</span>, השחקן בצד ימין <span class="kbd">חצים</span>+<span class="kbd">ENTER</span>. לבד מול המחשב: גם <span class="kbd">רווח</span> עובד.</p>`}
       <div class="howto-grid">${cards.map(([e, h, p]) => `<div class="howto-card"><div class="e">${e}</div><h4>${h}</h4><p>${p}</p></div>`).join('')}</div>
       <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn primary">יאללה!</button></div></div>`);
     const ov = this.overlay(modal);
@@ -918,16 +919,17 @@ class DuelHud {
 // ─────────────────────────────────────────────────────────── auction
 class AuctionUI {
   constructor(ui) { this.ui = ui; }
-  open({ idx, bidders }) {
+  open({ idx, bidders, hold = false }) {
     const t = TILES[idx];
     const col = t.district ? DISTRICTS[t.district].color : '#8c93a8';
     const el = $(`<div class="auction glass">
       <div class="lot"><i style="background:${col}"></i>מכירה פומבית · ${esc(t.name)} · מחיר רשמי ${money(t.price)}</div>
       <div class="price money">₪0</div>
-      <div class="status">היכונו! החזיקו את המקש כדי להישאר במכירה!</div>
-      <div class="bidders">${bidders.map((b) => `<div class="bidder" data-pid="${b.p.id}" style="--pc:${b.p.color}"><img src="${this.ui.pimg(b.p)}"><div class="nm">${esc(b.p.name)}</div><div class="st">${b.key ? `החזק <span class="kbd">${b.key}</span>` : 'מחשב'}</div></div>`).join('')}</div></div>`);
+      <div class="status">היכונו! מחזיקים את הכפתור כדי להישאר במכירה!</div>
+      <div class="bidders">${bidders.map((b) => `<div class="bidder" data-pid="${b.p.id}" style="--pc:${b.p.color}"><img src="${this.ui.pimg(b.p)}"><div class="nm">${esc(b.p.name)}</div><div class="st">${b.key ? (IS_TOUCH ? 'מחזיק ✋' : `החזק <span class="kbd">${b.key}</span>`) : 'מחשב'}</div></div>`).join('')}</div></div>`);
     this.ov = this.ui.overlay(el, { clear: false });
     this.el = el;
+    if (hold) this.addHold();
     return el;
   }
   price(n) {
@@ -944,5 +946,11 @@ class AuctionUI {
     b.classList.toggle('win', st === 'win');
     if (label) b.querySelector('.st').innerHTML = label;
   }
-  async close() { await this.ov?.close(); this.ov = null; }
+  /** Phones: one big button to hold instead of a keyboard key. */
+  addHold() {
+    if (!IS_TOUCH || !this.el || this.holdBtn) return;
+    this.holdBtn = bigHoldButton('✋ החזיקו כאן כדי להישאר', 'Space');
+    this.el.appendChild(this.holdBtn);
+  }
+  async close() { this.holdBtn?.release(); this.holdBtn = null; await this.ov?.close(); this.ov = null; }
 }

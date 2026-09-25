@@ -525,6 +525,7 @@ export class GuestSession {
     const args = des(m.args, this.state);
     const r = this.ui.auction[m.op]?.(...args);
     if (m.op === 'open' && r && this.me != null) {
+      this.ui.auction.addHold();
       const card = r.querySelector(`.bidder[data-pid="${this.me}"]`);
       if (card) {
         card.addEventListener('pointerdown', (e) => { e.preventDefault(); input.pressVirtual('Virtual'); });

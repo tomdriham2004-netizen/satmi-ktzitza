@@ -22,7 +22,7 @@ export async function runAuction({ ui, audio, idx, bidders, aiValues, holdFn = n
   };
   const holding = holdFn || localHold;
   const label = keyLabel || ((p) => (p.isAI ? null : SEAT_KEYS[p.seat].label + (soloHuman ? ' / רווח' : '')));
-  const el = ui.auction.open({ idx, bidders: bidders.map((p) => ({ p, key: label(p) })) });
+  const el = ui.auction.open({ idx, bidders: bidders.map((p) => ({ p, key: label(p) })), hold: soloHuman || !!holdFn });
   // Pointer hold support (touch / mouse) on the bidder cards — local offline play only
   const cleanups = [];
   if (!holdFn && el) {
@@ -57,7 +57,7 @@ export async function runAuction({ ui, audio, idx, bidders, aiValues, holdFn = n
     if (left !== lastBeep && left > 0) {
       lastBeep = left;
       audio.play('beep');
-      ui.auction.status(`החזיקו את המקש כדי להצטרף… <b>${left}</b>`);
+      ui.auction.status(`החזיקו את הכפתור כדי להצטרף… <b>${left}</b>`);
     }
     for (const p of bidders) {
       if (p.isAI) setState(p.id, (aiValues[p.id] ?? 0) >= start ? 'holding' : 'idle', (aiValues[p.id] ?? 0) >= start ? 'מחשב · בפנים' : 'מחשב · מוותר');

@@ -22,7 +22,7 @@ function gauss() { return (Math.random() + Math.random() + Math.random() - 1.5) 
 export class Stack extends Minigame {
   static meta = {
     id: 'stack', name: 'מגדל הזהב', icon: '🪙', countdown: true,
-    howto: 'לחצו על מקש הפעולה כדי <b>להפיל</b> את מטיל הזהב שזז. מה שבולט נחתך. המגדל הכי גבוה אחרי 22 שניות מנצח!',
+    howto: 'לחצו על כפתור הפעולה כדי <b>להפיל</b> את מטיל הזהב שזז. מה שבולט נחתך. המגדל הכי גבוה אחרי 22 שניות מנצח!',
   };
 
   async build() {

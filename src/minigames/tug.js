@@ -12,7 +12,7 @@ const LIMIT = 13;      // seconds
 export class Tug extends Minigame {
   static meta = {
     id: 'tug', name: 'משיכת כסף', icon: '🪢', countdown: true,
-    howto: '<b>לחצו מהר</b> על מקש הפעולה כדי למשוך את החבל. גררו את היריב לבריכת הכרישים, או תהיו בהובלה כשהזמן נגמר.',
+    howto: '<b>לחצו מהר</b> על כפתור הפעולה כדי למשוך את החבל. גררו את היריב לבריכת הכרישים, או תהיו בהובלה כשהזמן נגמר.',
   };
 
   async build() {

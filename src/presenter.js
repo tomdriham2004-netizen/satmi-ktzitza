@@ -13,6 +13,7 @@ import { audio } from "./audio/audio.js";
 import { Pawn } from "./render/characters.js";
 import { pawnSpot, tileSide, sideYaw, tileLocal, tileCenter, isCorner, BAND, HALF } from "./render/layout.js";
 import { money, $ } from "./ui/ui.js";
+import { IS_TOUCH, openDuelPads, closeDuelPads } from "./ui/touch.js";
 import { MINIGAMES } from "./minigames/index.js";
 import { runHeist } from "./minigames/heist.js";
 import { runAuction } from "./minigames/auction.js";
@@ -579,7 +580,7 @@ export class Presenter {
       auto: this.autoOf(auto, 1.0),
       buttons: [
         { id: 'buy', label: 'קנה', sub: canAfford ? `יישאר לך ${money(p.cash - t.price)}` : `יש לך רק ${money(p.cash)}`, icon: '🏷️', kind: 'primary', cost: money(t.price), disabled: !canAfford, hotkey: 'Space' },
-        { id: 'auction', label: 'מכירה פומבית', sub: 'כולם מתחרים: החזיקו את המקש!', icon: '🔨', kind: 'ghost', hotkey: 'KeyA' },
+        { id: 'auction', label: 'מכירה פומבית', sub: 'כולם מתחרים: מי מחזיק הכי הרבה זמן?', icon: '🔨', kind: 'ghost', hotkey: 'KeyA' },
       ],
     }).then((r) => { this.busyCard = false; if (r !== 'buy') this.ui.hidePropCard(); return r; });
   }
@@ -1024,6 +1025,7 @@ export class Presenter {
     const controls = net ? net.controls : humans === 2 ? [DUEL_KEYS.left, DUEL_KEYS.right] : [a.isAI ? null : DUEL_KEYS.solo, b.isAI ? null : DUEL_KEYS.solo];
     const keyHTML = (c, i) => {
       if (!c) return '<span class="kbd">מחשב</span>';
+      if (IS_TOUCH) return G.meta.id === 'sumo' ? 'ג׳ויסטיק לתזוזה · כפתור לזינוק' : 'לוחצים על הכפתור במסך';
       const move = G.meta.id === 'sumo' ? `<span class="kbd">${c.label.move}</span> תזוזה · ` : '';
       return `${move}<span class="kbd">${c.label.action}</span> פעולה`;
     };
@@ -1049,6 +1051,12 @@ export class Presenter {
     const tilt = this.stage.grade.uniforms.uTilt.value;
     this.stage.grade.uniforms.uTilt.value = 0.35;
     this.ui.duelHud.open({ a, b, title: `${G.meta.icon} ${G.meta.name.toUpperCase()}`, keysA: keyHTML(controls[0]), keysB: keyHTML(controls[1]) });
+    // phones: on-screen buttons for every side played on this screen
+    const pads = [];
+    controls.forEach((c, side) => { if (c && Array.isArray(c.action)) pads.push({ side, c, color: this.color(side ? b : a) }); });
+    const gn = net?.game;
+    if (gn?.localControls && gn.localSide >= 0) pads.push({ side: gn.localSide, c: gn.localControls, color: this.color(gn.localSide ? b : a) });
+    openDuelPads({ pads, move: G.meta.id === 'sumo', label: { quickdraw: 'שלוף!', stack: 'הפל!', tug: 'משוך!', sumo: 'זינוק!' }[G.meta.id] || 'פעולה' });
     await this.ui.wipe([], 'out');
     await g.intro();
     if (net) await net.ready();
@@ -1073,6 +1081,7 @@ export class Presenter {
     // ── back to the board
     await this.ui.wipe([this.color(winner), '#1d1838', this.color(winner)], 'in');
     this.ui.duelHud.close();
+    closeDuelPads();
     this.stage.setView(this.stage.scene, this.stage.camera);
     document.getElementById('labels').style.display = '';
     this.arena = null;

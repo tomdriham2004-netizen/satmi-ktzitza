@@ -27,12 +27,27 @@ export class CameraDirector {
 
   bindInput(dom) {
     let down = false, lx = 0, ly = 0, moved = 0;
+    // touch: track fingers so two of them pinch-zoom instead of orbiting
+    const fingers = new Map();
+    let pinch0 = 0, zoom0 = 1;
+    const spread = () => { const [a, b] = [...fingers.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
     dom.addEventListener('pointerdown', (e) => {
       if (e.button !== 0 && e.button !== 2) return;
+      if (e.pointerType === 'touch') {
+        fingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (fingers.size === 2) { pinch0 = spread(); zoom0 = this.user.zoom; down = false; this.dragging = true; return; }
+      }
       down = true; lx = e.clientX; ly = e.clientY; moved = 0; this.dragging = false;
     });
-    window.addEventListener('pointerup', () => { down = false; });
+    const lift = (e) => { fingers.delete(e.pointerId); if (fingers.size < 2) pinch0 = 0; down = false; };
+    window.addEventListener('pointerup', lift);
+    window.addEventListener('pointercancel', lift);
     window.addEventListener('pointermove', (e) => {
+      if (fingers.has(e.pointerId)) fingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinch0 && fingers.size >= 2) {
+        if (this.userEnabled) this.user.zoom = clamp(zoom0 * (pinch0 / Math.max(20, spread())), 0.45, 1.9);
+        return;
+      }
       if (!down || !this.userEnabled) return;
       const dx = e.clientX - lx, dy = e.clientY - ly;
       lx = e.clientX; ly = e.clientY;
@@ -138,7 +153,13 @@ export class CameraDirector {
       this.camera.rotation.z += (Math.random() - 0.5) * s * 0.05;
       this.shakeAmt *= Math.exp(-this.shakeDecay * realDt);
     }
-    const f = this.cur.fov + this.fovKick;
+    let f = this.cur.fov + this.fovKick;
+    // Portrait phones: widen the view so every shot keeps its sideways framing.
+    const a = this.camera.aspect;
+    if (a < 1.3) {
+      const s = Math.min(2.1, Math.pow(1.3 / a, 0.85));
+      f = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(f) / 2) * s));
+    }
     if (Math.abs(this.camera.fov - f) > 0.01) { this.camera.fov = f; this.camera.updateProjectionMatrix(); }
   }
 }

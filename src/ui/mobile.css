@@ -1,0 +1,283 @@
+/* ═══════════════════════════════════════════════════════════════════
+   BOOMTOWN on phones — touch controls + portrait / landscape layouts.
+   Loaded after styles.css so these rules win.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── touch controls ───────────────────────────────────────────────── */
+html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+button { touch-action: manipulation; }
+#touchpads { position: absolute; inset: 0; z-index: 35; pointer-events: none; direction: ltr; }
+.tp-pad { position: absolute; bottom: calc(18px + env(safe-area-inset-bottom)); display: flex; align-items: flex-end; gap: 18px; pointer-events: none; }
+.tp-pad > * { pointer-events: auto; }
+.tp-pad.solo { left: calc(18px + env(safe-area-inset-left)); right: calc(18px + env(safe-area-inset-right)); justify-content: space-between; }
+.tp-pad.solo .tp-action:only-child { margin-left: auto; }
+.tp-pad.left { left: calc(14px + env(safe-area-inset-left)); }
+.tp-pad.right { right: calc(14px + env(safe-area-inset-right)); flex-direction: row-reverse; }
+.tp-action {
+  width: 116px; height: 116px; border-radius: 50%; border: 5px solid #fff; cursor: pointer; user-select: none; -webkit-user-select: none;
+  font: 400 26px var(--display); color: #fff; -webkit-text-stroke: 4px rgba(0, 0, 0, 0.35); paint-order: stroke fill;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--pc) 55%, white), var(--pc));
+  box-shadow: 0 8px 0 color-mix(in srgb, var(--pc) 60%, black), 0 16px 30px -8px rgba(0, 0, 0, 0.55);
+  transition: transform 0.06s, box-shadow 0.06s; touch-action: none;
+}
+.tp-action.held { transform: translateY(6px) scale(0.96); box-shadow: 0 2px 0 color-mix(in srgb, var(--pc) 60%, black), 0 8px 16px -8px rgba(0, 0, 0, 0.5); }
+.tp-stick { position: relative; width: 132px; height: 132px; border-radius: 50%; touch-action: none;
+  background: rgba(20, 12, 50, 0.45); border: 4px solid rgba(255, 255, 255, 0.75); box-shadow: inset 0 4px 14px rgba(0, 0, 0, 0.4); }
+.tp-stick i { position: absolute; left: 50%; top: 50%; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--pc) 45%, white), var(--pc)); border: 4px solid #fff;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45); pointer-events: none; transition: transform 0.05s; }
+.tp-hold {
+  display: block; width: 100%; margin-top: 16px; padding: 22px 18px; border: 0; border-radius: 22px; cursor: pointer; touch-action: none;
+  font: 400 26px var(--display); color: #3d2600; background: linear-gradient(180deg, #ffd964, #ffb81f);
+  box-shadow: 0 7px 0 #c47a00, 0 16px 26px -12px rgba(20, 10, 50, 0.55); user-select: none; -webkit-user-select: none;
+}
+.tp-hold.held { transform: translateY(6px); box-shadow: 0 1px 0 #c47a00; background: linear-gradient(180deg, #7dffbf, #1fcf86); color: #053d24; }
+.heist .tp-hold.crack { width: min(420px, 86vw); margin-top: 6px; pointer-events: auto; }
+
+/* touch: no keyboard hints, no hover-only affordances */
+.touch .btn .kbd, .touch .pcard .kbd, .touch .slot .kind .bio, .touch #dock .kbd { display: none; }
+.touch .btn:hover { transform: none; filter: none; }
+.touch .btn:hover::after { transform: translateX(-120%); }
+
+/* ── phones: portrait ─────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  /* HUD */
+  #players { top: calc(6px + env(safe-area-inset-top)); left: 6px; right: 6px; gap: 5px; flex-direction: row; flex-wrap: nowrap; }
+  .pcard { flex: 1 1 0; min-width: 0; width: auto; grid-template-columns: 34px minmax(0, 1fr); gap: 6px; padding: 5px 7px 5px 5px; border-radius: 14px; }
+  .pcard .avatar { width: 34px; height: 34px; border-radius: 11px; }
+  .pcard .name { font-size: 11px; }
+  .pcard .tag { display: none; }
+  .pcard .cash { font-size: 16px; }
+  .pcard .deeds { display: none; }
+  .pcard .side { position: absolute; top: 3px; left: 4px; }
+  .pcard .badges span { width: 16px; height: 16px; font-size: 10px; border-radius: 5px; }
+  .pcard.active { transform: scale(1.04); }
+  @keyframes cardPulse { 40% { transform: scale(1.08); } }
+  .pcard .stamp { font-size: 11px; left: 4px; padding: 1px 4px; border-width: 2px; }
+  .pcard .delta { font-size: 14px; top: 2px; left: 6px; }
+
+  #topbar { top: calc(62px + env(safe-area-inset-top)); bottom: auto; gap: 5px; max-width: calc(100vw - 12px); flex-wrap: wrap; justify-content: center; }
+  .pill { padding: 4px 10px 4px 6px; gap: 6px; }
+  .pill .big { font-size: 15px; }
+  .clock { width: 28px; height: 28px; }
+  .clock .ico { font-size: 13px; }
+  .phase-txt small { font-size: 9px; }
+  .hype-chip { font-size: 10.5px; padding: 4px 8px 4px 6px; }
+  #menubar { top: auto; bottom: calc(150px + env(safe-area-inset-bottom)); left: 8px; flex-direction: column; gap: 6px; }
+  .iconbtn { width: 40px; height: 40px; border-radius: 12px; font-size: 16px; }
+  #feed { display: none; }
+  #toasts { top: calc(110px + env(safe-area-inset-top)); max-width: calc(100vw - 20px); }
+  .toast { font-size: 12.5px; padding: 8px 14px; white-space: normal; text-align: center; border-radius: 18px; }
+
+  /* dock: full-width bar with big thumb-friendly buttons */
+  #dock { left: 8px; right: 8px; width: auto; max-width: none; transform: none; bottom: calc(8px + env(safe-area-inset-bottom)); padding: 8px; gap: 8px; border-radius: 22px; flex-wrap: wrap; justify-content: center; }
+  #dock.away { transform: translateY(160%); }
+  #dock .who { display: none; }
+  #dock .group { flex: 1 1 100%; }
+  #dock .group .btn { flex: 1; padding: 12px 6px; font-size: 14px; gap: 5px; }
+  #dock .group .btn .ico { font-size: 17px; }
+  #dock .sep { display: none; }
+  #dock > .btn { flex: 1 1 100%; padding: 15px; font-size: 20px; }
+  #dock .hint { flex: 1 1 100%; text-align: center; font-size: 12px; }
+  .thinking { font-size: 13px; padding: 4px 10px 4px 4px; }
+  .thinking img { width: 32px; height: 32px; }
+
+  /* property card: a bottom sheet */
+  #propcard { left: 8px; right: 8px; width: auto; top: auto; bottom: calc(8px + env(safe-area-inset-bottom)); transform: none; max-height: calc(100dvh - 120px); overflow: auto; border-radius: var(--r); }
+  #propcard.away { transform: translateY(115%); }
+  .deed .head { padding: 10px 14px 8px; }
+  .deed .title { font-size: 23px; margin-top: 2px; }
+  .deed .body { padding: 8px 12px 10px; }
+  .deed .price-row { margin-bottom: 4px; }
+  .deed .price-row .money { font-size: 22px; }
+  .rent-table { font-size: 12px; }
+  .rent-table td { padding: 2px 6px; }
+  .deed .note { padding: 0 12px 8px; font-size: 11.5px; }
+  .deed .actions { flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 0 12px 12px; }
+  .deed .actions .btn { flex: 1 1 calc(50% - 8px); min-width: 0; padding: 12px 10px; white-space: normal; }
+  .deed .actions .btn .cost { font-size: 17px; }
+  .deed .stamp { top: 44px; font-size: 26px; }
+
+  /* banners */
+  .banner .title { font-size: clamp(34px, 11vw, 60px); -webkit-text-stroke-width: 7px; padding: 0 10px; }
+  .banner.turn .title { font-size: clamp(30px, 9vw, 52px); }
+  .banner .subtitle { max-width: 92vw; font-size: 13.5px; white-space: normal; }
+  .banner .ribbon { height: 96px; }
+  .banner.turn .avatar { width: 84px; height: 84px; }
+
+  /* modals: bottom sheets that scroll inside */
+  .overlay { align-items: end; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); }
+  .overlay.clear, .overlay:has(.cardwrap), .overlay:has(.heist) { align-items: center; }
+  .modal { width: 100%; max-height: calc(100dvh - 20px); padding: 16px; border-radius: 22px; }
+  .modal h2 { font-size: 25px; }
+  .modal .lead { font-size: 13px; }
+  .modal .row .btn { flex: 1 1 auto; }
+  .modal .choices .btn { white-space: normal; }
+  .choice-head img { width: 48px; height: 48px; border-radius: 14px; }
+  .pf-row { grid-template-columns: 1fr; gap: 6px; }
+  .pf-row .acts { flex-wrap: wrap; }
+  .pf-row .acts .btn { flex: 1 1 auto; }
+  .trade-partners { flex-wrap: wrap; }
+  .trade-summary { flex-direction: column; align-items: stretch; }
+  .trade-summary .row .btn { flex: 1; }
+  .trade-offer { grid-template-columns: 1fr; }
+  .trade-offer .arrow { text-align: center; transform: rotate(90deg); }
+  .cash-in input[type=range] { height: 30px; }
+
+  /* cards */
+  .gcard { width: min(340px, 90vw); min-height: 400px; }
+  .gcard .emoji { font-size: 76px; margin: 16px 0 6px; }
+  .gcard .ctitle { font-size: 32px; }
+
+  /* auction / heist */
+  .auction { width: 100%; padding: 16px; }
+  .auction .price { font-size: 64px; }
+  .bidder { width: 96px; padding: 8px 6px; }
+  .bidder img { width: 50px; height: 50px; }
+  .dials { gap: 10px; margin-bottom: 26px; }
+  .dial { width: 100px; height: 100px; }
+  .dial .state { font-size: 11px; bottom: -28px; }
+  .heist { width: 100%; }
+  .heist .loot { font-size: 21px; text-align: center; }
+  .heist > .glass { max-width: 90vw; text-align: center; }
+
+  /* VS: the two halves stack top / bottom */
+  .vs-half { width: 100%; height: 50%; justify-content: center; }
+  .vs-half.l { top: 0; bottom: auto; clip-path: polygon(0 0, 100% 0, 100% 86%, 0 100%); padding: 0 6vw; }
+  .vs-half.r { top: auto; bottom: 0; clip-path: polygon(0 14%, 100% 0, 100% 100%, 0 100%); padding: 0 6vw; }
+  @keyframes vsInL { from { transform: translateY(-100%); } }
+  @keyframes vsInR { from { transform: translateY(100%); } }
+  @keyframes vsOutL { to { transform: translateY(-105%); } }
+  @keyframes vsOutR { to { transform: translateY(105%); } }
+  .vs-half.r { justify-content: flex-start; padding-top: 7vh; }
+  .vs-half img { width: min(19vh, 150px); }
+  .vs-half .nm { font-size: clamp(28px, 8vw, 44px); }
+  .vs-mid { top: 50%; font-size: 84px; -webkit-text-stroke-width: 10px; }
+  .vs-game { bottom: calc(10px + env(safe-area-inset-bottom)); min-width: 0; width: calc(100vw - 20px); padding: 10px 14px; }
+  .vs-game .gt { font-size: 24px; }
+  .vs-game .gd { font-size: 12px; }
+
+  /* duel HUD */
+  .dh-top { top: calc(8px + env(safe-area-inset-top)); gap: 6px; padding: 0 6px; }
+  .dh-plate { min-width: 0; flex: 1; padding: 4px 8px 4px 4px; gap: 6px; border-radius: 14px; border-width: 2px; }
+  .dh-plate.r { padding: 4px 4px 4px 8px; }
+  .dh-plate img { width: 34px; height: 34px; border-radius: 10px; }
+  .dh-plate .nm { font-size: 11.5px; }
+  .dh-plate .keys { display: none; }
+  .dh-plate .sc { font-size: 22px; }
+  .dh-timer { font-size: 24px; min-width: 44px; }
+  .dh-title { top: calc(62px + env(safe-area-inset-top)); font-size: 11px; white-space: nowrap; }
+  .dh-big { font-size: clamp(40px, 15vw, 90px); -webkit-text-stroke-width: 9px; }
+  .tp-action { width: 104px; height: 104px; font-size: 23px; }
+  .tp-stick { width: 124px; height: 124px; }
+
+  /* title screen: one scrolling column */
+  #title { display: block; overflow-y: auto; overflow-x: hidden; padding: calc(14px + env(safe-area-inset-top)) 10px calc(18px + env(safe-area-inset-bottom)); -webkit-overflow-scrolling: touch; }
+  .logo-wrap { text-align: center; margin: 4px 0 12px; }
+  .logo { justify-content: center; font-size: clamp(54px, 17vw, 88px); }
+  .logo span { -webkit-text-stroke-width: 8px; }
+  .tagline { font-size: 13px; margin-top: 10px; padding: 7px 14px; }
+  .feature-row { justify-content: center; gap: 5px; margin: 10px auto 0; }
+  .feature-row span { font-size: 11px; padding: 5px 8px; }
+  .setup { padding: 14px; }
+  .setup h3 { font-size: 22px; }
+  .maps { grid-template-columns: repeat(3, 1fr); }
+  .map-card { padding: 7px 2px; font-size: 12px; }
+  .slot { grid-template-columns: 26px 50px minmax(0, 1fr) auto; gap: 7px; padding: 6px; position: relative; }
+  .slot .arrows button { width: 26px; height: 26px; }
+  .slot .face { width: 50px; height: 50px; }
+  .slot input { font-size: 16px; }
+  .slot .bio { font-size: 10.5px; }
+  .slot .rm { position: absolute; top: 2px; left: 4px; }
+  .slot .kind .seg button { padding: 7px 7px; font-size: 11.5px; }
+  .opts { grid-template-columns: 1fr; gap: 8px; }
+  .opt .seg { display: flex; width: 100%; }
+  .opt .seg button { flex: 1; padding: 10px 4px; }
+  .setup .go-row .btn { padding: 15px; }
+
+  /* how to / game over / settings / lobby */
+  .howto-grid { grid-template-columns: 1fr; gap: 8px; }
+  .howto-card { padding: 10px 12px; }
+  .howto-card h4 { font-size: 18px; }
+  .gameover { padding: 16px; }
+  .awards { grid-template-columns: 1fr 1fr; }
+  .gameover .winner img { width: 110px; height: 110px; }
+  .gameover h1 { font-size: 38px; }
+  .standing { grid-template-columns: 26px 36px 1fr auto; padding: 6px 8px; }
+  .standing img { width: 36px; height: 36px; }
+  .gameover .row .btn { flex: 1; padding: 13px 10px; font-size: 16px; }
+  .setting { flex-wrap: wrap; gap: 6px; }
+  .setting .seg button { padding: 9px 12px; }
+  .lobby { padding: 16px; }
+  .lobby .code { flex-wrap: wrap; }
+  .lobby .code .link { flex-basis: 100%; order: 3; }
+  .lobby .maps { grid-template-columns: repeat(3, 1fr); }
+  #emotes { left: 8px; right: auto; bottom: calc(150px + env(safe-area-inset-bottom)); flex-direction: column; padding: 4px; }
+  #emotes button { width: 36px; height: 36px; font-size: 19px; }
+  .net-banner { top: calc(110px + env(safe-area-inset-top)); white-space: nowrap; }
+  .tile-tip { font-size: 12px; }
+}
+
+/* ── phones: landscape (short screens) ────────────────────────────── */
+@media (max-height: 500px) and (min-width: 721px) {
+  #players { top: 6px; right: 8px; gap: 4px; }
+  .pcard { width: 190px; grid-template-columns: 34px 1fr auto; gap: 6px; padding: 4px 6px 4px 4px; border-radius: 14px; }
+  .pcard .avatar { width: 34px; height: 34px; border-radius: 11px; }
+  .pcard .name { font-size: 11.5px; }
+  .pcard .cash { font-size: 17px; }
+  .pcard .deeds { display: none; }
+  #topbar { top: 6px; }
+  .pill { padding: 3px 10px 3px 5px; }
+  .pill .big { font-size: 15px; }
+  .clock { width: 26px; height: 26px; }
+  #menubar { top: 6px; left: 8px; gap: 5px; }
+  .iconbtn { width: 36px; height: 36px; font-size: 15px; border-radius: 11px; }
+  #feed { display: none; }
+  #toasts { top: 50px; }
+  #dock { bottom: 6px; padding: 6px; gap: 6px; }
+  #dock .who { display: none; }
+  #dock .btn { padding: 10px 14px; font-size: 14px; }
+  #dock .btn.lg { padding: 12px 22px; font-size: 18px; }
+  #propcard { top: 8px; bottom: 8px; transform: none; width: 330px; overflow: auto; }
+  .deed .actions .btn .sub { display: none; }
+  #propcard.away { transform: translateX(-120%); }
+  .deed .head { padding: 8px 12px 6px; }
+  .deed .title { font-size: 20px; }
+  .deed .body { padding: 6px 12px 8px; }
+  .rent-table { font-size: 11.5px; }
+  .rent-table td { padding: 0 6px; }
+  .deed .meta, .deed .note, .deed .owner { display: none; }
+  .deed .price-row { margin-bottom: 2px; }
+  .deed .price-row .money { font-size: 22px; }
+  .deed .actions { flex-direction: row; gap: 6px; padding: 0 10px 10px; }
+  .deed .actions .btn { flex: 1; padding: 10px 8px; white-space: normal; }
+  .overlay { padding: 6px; }
+  .modal { max-height: calc(100dvh - 12px); padding: 14px; }
+  .modal h2 { font-size: 24px; }
+  .gcard { min-height: 340px; width: 300px; }
+  .gcard .emoji { font-size: 56px; margin: 8px 0 4px; }
+  .gcard .ctitle { font-size: 28px; }
+  .banner .title { font-size: 48px; }
+  .auction { padding: 12px; max-height: calc(100dvh - 12px); overflow: auto; }
+  .auction .price { font-size: 52px; margin: 2px 0; }
+  .bidder img { width: 44px; height: 44px; }
+  .tp-hold { padding: 14px; margin-top: 10px; font-size: 22px; }
+  .dial { width: 110px; height: 110px; }
+  .dh-top { top: 6px; }
+  .dh-plate { min-width: 190px; }
+  .dh-plate img { width: 34px; height: 34px; }
+  .dh-plate .keys { display: none; }
+  .dh-title { top: 64px; }
+  .vs-half { justify-content: flex-start; padding-top: 6vh; gap: 2px; }
+  .vs-half img { width: 30vh; }
+  .vs-game { bottom: 10px; padding: 8px 16px; }
+  .vs-game .gt { font-size: 22px; }
+  #title { grid-template-columns: 1fr minmax(380px, 460px); padding: 10px 14px; align-items: start; overflow: auto; }
+  .logo-wrap { align-self: start; position: sticky; top: 0; padding-top: 8vh; text-align: center; }
+  .logo { font-size: 64px; justify-content: center; }
+  .feature-row { display: none; }
+  .setup { padding: 12px; }
+  .slot { padding: 4px; }
+  .slot .face { width: 46px; height: 46px; }
+  .howto-grid { grid-template-columns: repeat(2, 1fr); }
+}

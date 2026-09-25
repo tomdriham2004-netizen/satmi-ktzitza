@@ -5,6 +5,7 @@
 // mode 'spectate' — mirror someone else's attempt from those events
 import { every, wait, lerp } from "../core/tween.js";
 import { input, DUEL_KEYS } from "../core/input.js";
+import { IS_TOUCH, bigHoldButton } from "../ui/touch.js";
 import { $, money } from "../ui/ui.js";
 import { rand } from "../core/rng.js";
 
@@ -52,9 +53,14 @@ export async function runHeist({ ui, audio, player, pot, skill = null, onDial, m
         <div class="state">${i === 0 ? 'מוכן' : 'נעול'}</div>
       </div>`).join('')}</div>
     <div class="glass" style="padding:10px 16px;border-radius:16px;font:800 14px var(--font)">
-      ${!spectate && skill == null && local ? `לחצו <span class="kbd">רווח</span> כשהמחוג נמצא על ה<span style="color:#1fcf86">ירוק</span>` : `${player.name} מסובב את החוגות…`}
+      ${!spectate && skill == null && local ? (IS_TOUCH ? `לחצו על הכפתור כשהמחוג נמצא על ה<span style="color:#1fcf86">ירוק</span>` : `לחצו <span class="kbd">רווח</span> כשהמחוג נמצא על ה<span style="color:#1fcf86">ירוק</span>`) : `${player.name} מסובב את החוגות…`}
     </div></div>`);
   const ov = ui.overlay(host, { clear: true });
+  let crackBtn = null;
+  if (IS_TOUCH && !spectate && skill == null && local) {
+    crackBtn = bigHoldButton('🔓 פרוץ!', 'Space', 'crack');
+    host.appendChild(crackBtn);
+  }
   audio.play('drumroll', { count: 20 });
   await wait(0.9, true);
   let cracked = 0;
@@ -114,6 +120,8 @@ export async function runHeist({ ui, audio, player, pot, skill = null, onDial, m
   }
   if (!spectate) emit({ e: 'end', cracked });
   host.querySelector('.loot').textContent = cracked === 3 ? 'ג׳קפוט!' : cracked === 0 ? 'אזעקה!!!' : `${cracked}/3: שלל חלקי`;
+  crackBtn?.release();
+  crackBtn?.remove();
   await wait(1.1, true);
   await ov.close();
   return cracked;
